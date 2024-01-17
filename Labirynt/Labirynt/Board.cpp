@@ -1,56 +1,105 @@
 #include "Board.h"
 
-// Funkcja sprawdzaj¹ca, czy dane wspó³rzêdne s¹ poprawne na planszy
-bool Board::isValid(int x, int y, int m, int n) {
+// Cheching if coordinates are valid on board
+bool Board::isValid(int x, int y, int m, int n) 
+{
     return x >= 0 && x < m && y >= 0 && y < n;
 }
 
-// Funkcja rozwi¹zuj¹ca problem labiryntu
-vector<string> Board::findPath(vector<vector<char>>& board) {
-    int m = board.size(); // Liczba wierszy planszy
-    int n = board[0].size(); // Liczba kolumn planszy
-    vector<vector<bool>> visited(m, vector<bool>(n, false)); // Tablica odwiedzonych pól
-    queue<tuple<int, int, vector<string>>> q; // Kolejka BFS
 
-    // Dodaj pierwszy wiersz do kolejki jako punkty startowe
+vector<string> Board::BFS(vector<vector<char>>& board) 
+{
+    
+    int m = board.size(); // Number of rows
+    int n = board[0].size(); // Number od columns
+    vector<vector<bool>> visited(m, vector<bool>(n, false)); // Array of visited fields
+
+    // First row of queue is starting points
     for (int i = 0; i < n; ++i) {
         if (board[0][i] == 'B') {
-            q.push({ 0, i, {to_string(i + 1)} });
+            queue.push({ 0, i, {to_string(i + 1)} });
             visited[0][i] = true;
         }
     }
 
-    // Przeszukuj labirynt za pomoc¹ BFS
-    while (!q.empty()) {
+    // Use BFS
+    while (!queue.empty()) {
         int x, y;
-        vector<string> path;
-        tie(x, y, path) = q.front();
-        q.pop();
+        
+        tie(x, y, path) = queue.front();
+        queue.pop();
 
         if (x == m - 1) {
-            // Jeœli doszliœmy do ostatniego wiersza, zwracamy znalezion¹ œcie¿kê
+            // If we at last row we return path
             return path;
         }
 
-        // Mo¿liwe ruchy: w górê, w dó³, w lewo i w prawo
+        // Possible moves: up, down, left, rigth
         int dx[] = { -1, 1, 0, 0 };
         int dy[] = { 0, 0, -1, 1 };
-        string directions[] = { "Up", "Down", "Left", "Rigth" };
+        string directions[] = { "Up ", "Down ", "Left ", "Rigth " };
 
         for (int i = 0; i < 4; ++i) {
-            int newX = x + dx[i];
-            int newY = y + dy[i];
+            int X = x + dx[i];
+            int Y = y + dy[i];
 
-            if (isValid(newX, newY, m, n) && !visited[newX][newY] && board[newX][newY] == 'B') {
-                visited[newX][newY] = true;
+            if (isValid(X, Y, m, n) && !visited[X][Y] && board[X][Y] == 'B') {
+                visited[X][Y] = true;
                 vector<string> newPath = path;
                 newPath.push_back(directions[i]);
-                q.push({ newX, newY, newPath });
+                queue.push({ X, Y, newPath });
             }
         }
     }
 
-    // Jeœli nie uda³o siê znaleŸæ œcie¿ki, zwracamy pust¹ listê
+    // If there is no path found, return empty list.
     return {};
 }
 
+// Funkcja rysuj¹ca planszê w oknie SFML
+void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& board, const vector<string>& path) 
+{
+    /*sf::Font font;
+    if (!font.loadFromFile("arial.ttf")) {
+        cerr << "Cannot load the font. " << endl;
+        exit(EXIT_FAILURE);
+    }*/
+
+    for (size_t i = 0; i < board.size(); ++i) {
+        for (size_t j = 0; j < board[i].size(); ++j) {
+            sf::RectangleShape tile(sf::Vector2f(tileSize, tileSize));
+            tile.setOutlineThickness(2);
+            tile.setOutlineColor(sf::Color::Black);
+            tile.setPosition(j * tileSize, i * tileSize);
+
+
+            if (board[i][j] == 'B') {
+                tile.setFillColor(sf::Color::White);
+            }
+            else if (board[i][j] == 'C') {
+                tile.setFillColor(sf::Color::Black);
+            }
+
+            window.draw(tile);
+        }
+    }
+
+    /*// Draw the path
+    for (size_t i = 0; i < path.size(); ++i) {
+        sf::Text text(path[i], font, 20);
+        text.setPosition(i * tileSize, board.size() * tileSize);
+        window.draw(text);
+    }*/
+    
+    // Set starting point as black square
+    for (size_t j = 0; j < board[0].size(); ++j) {
+        if (board[0][j] == 'B') {
+            sf::RectangleShape startTile(sf::Vector2f(tileSize, tileSize));
+            startTile.setOutlineThickness(2);
+            startTile.setOutlineColor(sf::Color::Black);
+            startTile.setPosition(j * tileSize, 0);
+            startTile.setFillColor(sf::Color::Cyan);
+            window.draw(startTile);
+        }
+    }
+}
