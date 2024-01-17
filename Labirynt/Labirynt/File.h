@@ -4,4 +4,5 @@ class File
 {
 public:
 	vector<vector<char>> loadBoardFromFile(const string& filename, int& m, int& n);
+	int saveSolution(const string& outname, vector<string> path);
 };

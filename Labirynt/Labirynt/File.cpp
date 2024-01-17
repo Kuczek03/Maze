@@ -1,10 +1,11 @@
 #include "File.h"
 
-// Funkcja generuj¹ca planszê z pliku
-vector<vector<char>> File::loadBoardFromFile(const string& filename, int& m, int& n) {
+// Generating board form the file
+vector<vector<char>> File::loadBoardFromFile(const string& filename, int& m, int& n) 
+{
     ifstream file(filename);
     if (!file.is_open()) {
-        cerr << "Nie mo¿na otworzyæ pliku " << filename << endl;
+        cerr << "Cannot open file " << filename <<"." << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -19,4 +20,30 @@ vector<vector<char>> File::loadBoardFromFile(const string& filename, int& m, int
 
     file.close();
     return board;
+}
+
+int File::saveSolution(const string& outname, vector<string> path)
+{
+    ofstream outputFile(outname);
+    if (!outputFile.is_open()) {
+        cerr << "Cannot create file " << outname << "." << endl;
+        return EXIT_FAILURE;
+    }
+
+    if (path.empty()) {
+        outputFile << "There is no solution." << endl;
+    }
+    else {
+        outputFile << "Here is the solution:  ";
+        for (const string& direction : path) {
+            outputFile << direction << endl;
+        }
+        outputFile << endl;
+    }
+
+    outputFile.close();
+
+    cout << "Solution saved in file " << outname << "." << endl;
+
+    return 1;
 }
