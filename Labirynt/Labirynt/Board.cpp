@@ -1,4 +1,5 @@
 #include "Board.h"
+using namespace std;
 
 // Cheching if coordinates are valid on board
 bool Board::isValid(int x, int y, int m, int n) 
@@ -37,7 +38,7 @@ vector<string> Board::BFS(vector<vector<char>>& board)
         // Possible moves: up, down, left, rigth
         int dx[] = { -1, 1, 0, 0 };
         int dy[] = { 0, 0, -1, 1 };
-        string directions[] = { "Up ", "Down ", "Left ", "Rigth " };
+        string directions[] = { "Up", "Down", "Left", "Rigth" };
 
         for (int i = 0; i < 4; ++i) {
             int X = x + dx[i];
@@ -55,6 +56,59 @@ vector<string> Board::BFS(vector<vector<char>>& board)
     // If there is no path found, return empty list.
     return {};
 }
+
+// Funkcja pomocnicza do sprawdzenia, czy dane pole jest dostêpne
+bool Board::isAvailable(const vector<vector<char>>& maze, int x, int y, int m, int n) {
+    return x > 0 && x < m - 1 && y > 0 && y < n - 1 && maze[x][y] == 'C';
+}
+
+// Funkcja pomocnicza do sprawdzenia liczby dostêpnych s¹siadów
+int Board::countAvailableNeighbors(const vector<vector<char>>& maze, int x, int y) {
+    int count = 0;
+    if (isAvailable(maze, x - 2, y, maze.size(), maze[0].size())) count++;
+    if (isAvailable(maze, x + 2, y, maze.size(), maze[0].size())) count++;
+    if (isAvailable(maze, x, y - 2, maze.size(), maze[0].size())) count++;
+    if (isAvailable(maze, x, y + 2, maze.size(), maze[0].size())) count++;
+    return count;
+}
+
+// Funkcja generuj¹ca labirynt przy u¿yciu algorytmu Recursive Backtracking
+void Board::generate(vector<vector<char>>& maze, int x, int y, mt19937& gen) {
+    vector<Point> directions = { {0, 2}, {0, -2}, {2, 0}, {-2, 0} };
+    shuffle(directions.begin(), directions.end(), gen);
+
+    for (const auto& dir : directions) {
+        int newX = x + dir.x;
+        int newY = y + dir.y;
+
+        if (isAvailable(maze, newX, newY, maze.size(), maze[0].size())) {
+            maze[x + dir.x / 2][y + dir.y / 2] = 'B'; // Oznaczamy œrodek drogi jako dostêpny
+            maze[newX][newY] = 'B'; // Oznaczamy nowe pole jako dostêpne
+            generate(maze, newX, newY, gen);
+        }
+    }
+}
+
+// Funkcja generuj¹ca losowy labirynt
+vector<vector<char>> Board::generateRandomMaze(int m, int n) {
+    vector<vector<char>> maze(m, vector<char>(n, 'C')); // Inicjalizacja ca³ego labiryntu jako œciany
+
+    random_device rd;
+    mt19937 gen(rd());
+
+    // Losowo wybieramy punkt startowy i oznaczamy go jako dostêpny
+    uniform_int_distribution<int> startXDist(1, m - 2);
+    uniform_int_distribution<int> startYDist(1, n - 2);
+
+    int startX = startXDist(gen);
+    int startY = startYDist(gen);
+    maze[startX][startY] = 'B';
+
+    generate(maze, startX, startY, gen);
+
+    return maze;
+}
+
 
 // Funkcja rysuj¹ca planszê w oknie SFML
 void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& board, const vector<string>& path) 
@@ -90,8 +144,37 @@ void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& boar
         text.setPosition(i * tileSize, board.size() * tileSize);
         window.draw(text);
     }*/
+    /*// Zamaluj znalezion¹ œcie¿kê na zielono
+    int x = 0;
+    int y = 0;
+
+    sf::RectangleShape pathTile(sf::Vector2f(tileSize, tileSize));
+    pathTile.setFillColor(sf::Color::Green);
+
+    for (const string& direction : path) {
+        if (direction == "Up") {
+            y--;
+        }
+        else if (direction == "Down") {
+            y++;
+        }
+        else if (direction == "Left") {
+            x--;
+        }
+        else if (direction == "Rigth") {
+            x++;
+        }
+        else {
+            cerr << "Error. Unown direction on path" << endl;
+            exit(EXIT_FAILURE);
+        }
+
+        pathTile.setPosition(x * tileSize, y * tileSize);
+        window.draw(pathTile);
+    }*/
     
-    // Set starting point as black square
+
+    // Set starting point as cyan square
     for (size_t j = 0; j < board[0].size(); ++j) {
         if (board[0][j] == 'B') {
             sf::RectangleShape startTile(sf::Vector2f(tileSize, tileSize));

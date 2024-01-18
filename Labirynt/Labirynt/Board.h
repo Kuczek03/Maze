@@ -1,3 +1,4 @@
+#pragma once
 #include "asstes.h"
 #include <fcntl.h>
 class Board
@@ -15,8 +16,13 @@ private:
 	const int tileSize = 40;
 public:
 	vector<string> BFS(vector<vector<char>>& board);
+	vector<vector<char>> generateRandomMaze(int m, int n);
 
 	bool isValid(int x, int y, int m, int n);
 	void drawBoard(sf::RenderWindow& window, const vector<vector<char>>& board, const vector<string>& path);
+
+	bool isAvailable(const vector<vector<char>>& maze, int x, int y, int m, int n);
+	int countAvailableNeighbors(const vector<vector<char>>& maze, int x, int y);
+	void generate(vector<vector<char>>& maze, int x, int y, mt19937& gen);
 };
 
