@@ -6,4 +6,5 @@
 #include <fstream>
 #include <string>
 #include <locale.h>
+#include <random>
 using namespace std;
