@@ -18,7 +18,7 @@ void Window::mazeFromFile(const string& filename, const string& outname)
     vector<string> path = board.BFS(maze);
 
     window->create(sf::VideoMode(c * tileSize, r * tileSize), "Maze from the file");
-
+    
     // Window loop
     while (window->isOpen()) {
         sf::Event ev;
@@ -42,8 +42,9 @@ void Window::mazeFromFile(const string& filename, const string& outname)
         }
  
         window->clear();
+
         board.drawBoard(*window, maze, path);
-       
+        
         window->display();
     }
     file.saveSolution(outname, path);
@@ -52,8 +53,9 @@ void Window::mazeFromFile(const string& filename, const string& outname)
 void Window::drawMaze(const string& outname, int choice, int r, int c)
 {
     vector<vector<char>> maze = board.generateMaze(r, c);
-    vector<string> path = board.BFS(maze);
+    //vector<string> path = board.BFS(maze);
     window->create(sf::VideoMode(c * tileSize, r * tileSize), "Random generated maze");
+    
     
 
     while (window->isOpen()) {
@@ -78,11 +80,12 @@ void Window::drawMaze(const string& outname, int choice, int r, int c)
         }
 
         window->clear();
-        board.drawBoard(*window, maze, path);
-
+        //board.drawBoard(*window, maze, path);
+        board.floydWarshall(maze, r, c);
+        board.visualizeShortestPath(*window, maze, r, c);
         window->display();
     }
-    file.saveSolution(outname, path);
+    //file.saveSolution(outname, path);
 }
 
 /*void Window::randomGeneratedMaze(const string & filename, const string & outname)

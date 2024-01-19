@@ -57,60 +57,6 @@ vector<string> Board::BFS(vector<vector<char>>& board)
     return {};
 }
 
-/*// Funkcja pomocnicza do sprawdzenia, czy dane pole jest dostêpne
-bool Board::isAvailable(const vector<vector<char>>& maze, int x, int y, int m, int n) {
-    return x > 0 && x < m - 1 && y > 0 && y < n - 1 && maze[x][y] == 'C';
-}
-
-// Funkcja pomocnicza do sprawdzenia liczby dostêpnych s¹siadów
-int Board::countAvailableNeighbors(const vector<vector<char>>& maze, int x, int y) {
-    int count = 0;
-    if (isAvailable(maze, x - 2, y, maze.size(), maze[0].size())) count++;
-    if (isAvailable(maze, x + 2, y, maze.size(), maze[0].size())) count++;
-    if (isAvailable(maze, x, y - 2, maze.size(), maze[0].size())) count++;
-    if (isAvailable(maze, x, y + 2, maze.size(), maze[0].size())) count++;
-    return count;
-}
-
-// Funkcja generuj¹ca labirynt przy u¿yciu algorytmu Recursive Backtracking
-void Board::generate(vector<vector<char>>& maze, int x, int y, mt19937& gen) {
-    vector<Point> directions = { {0, 2}, {0, -2}, {2, 0}, {-2, 0} };
-    shuffle(directions.begin(), directions.end(), gen);
-
-    for (const auto& dir : directions) {
-        int newX = x + dir.x;
-        int newY = y + dir.y;
-
-        if (isAvailable(maze, newX, newY, maze.size(), maze[0].size())) {
-            maze[x + dir.x / 2][y + dir.y / 2] = 'B'; // Oznaczamy œrodek drogi jako dostêpny
-            maze[newX][newY] = 'B'; // Oznaczamy nowe pole jako dostêpne
-            generate(maze, newX, newY, gen);
-        }
-    }
-}
-
-// Funkcja generuj¹ca losowy labirynt
-vector<vector<char>> Board::generateRandomMaze(int m, int n) {
-    vector<vector<char>> maze(m, vector<char>(n, 'C')); // Inicjalizacja ca³ego labiryntu jako œciany
-
-    random_device rd;
-    mt19937 gen(rd());
-
-    // Losowo wybieramy punkt startowy i oznaczamy go jako dostêpny
-    uniform_int_distribution<int> startXDist(1, m - 2);
-    uniform_int_distribution<int> startYDist(1, n - 2);
-
-    int startX = startXDist(gen);
-    int startY = startYDist(gen);
-    maze[startX][startY] = 'B';
-
-    generate(maze, startX, startY, gen);
-
-    return maze;
-}*/
-
-
-
 // Funkcja rysuj¹ca planszê w oknie SFML
 void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& board, const vector<string>& path) 
 {
@@ -196,10 +142,9 @@ void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& boar
 
 vector<vector<char>> Board::generateMaze(int r, int c) {
     
-    srand(time(0)); // Seed for random number generator
+    srand(time(NULL)); // Seed for random number generator
 
     // Create a 2D array to represent the maze
-    //char maze[200][200];
     vector<vector<char>> maze(r, vector<char>(c));
 
     // Fill the maze with walls ("C")
@@ -231,10 +176,9 @@ vector<vector<char>> Board::generateMaze(int r, int c) {
 
 vector<vector<char>> Board::generateMazeWithProbability(int r, int c, double wallProbability)
 {
-    srand(time(0)); // Seed for random number generator
+    srand(time(NULL)); // Seed for random number generator
 
     // Create a 2D array to represent the maze
-    //char maze[200][200];
     vector<vector<char>> maze(r, vector<char>(c));
 
     // Fill the maze with walls ("C") based on user-defined probability
@@ -304,4 +248,129 @@ void Board::addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>
         if(maze[row][col] != 'S')
             maze[row][col] = 'M';
     }
+}
+
+void Board::floydWarshall(vector<vector<char>>& maze, int r, int c) {
+    // Set start vertex to "S" if not provided
+    bool hasStart = false;
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            if (maze[i][j] == 'S') {
+                hasStart = true;
+                break;
+            }
+        }
+        if (hasStart) {
+            break;
+        }
+    }
+    if (!hasStart) {
+        maze[0][0] = 'S';
+    }
+
+    // Set end vertex to "M" if not provided
+    bool hasEnd = false;
+    for (int i = r - 1; i >= 0; --i) {
+        for (int j = c - 1; j >= 0; --j) {
+            if (maze[i][j] == 'M') {
+                hasEnd = true;
+                break;
+            }
+        }
+        if (hasEnd) {
+            break;
+        }
+    }
+    if (!hasEnd) {
+        maze[r - 1][c - 1] = 'M';
+    }
+
+    // Main algorithm
+    for (int k = 0; k < r * c; ++k) {
+        for (int i = 0; i < r * c; ++i) {
+            for (int j = 0; j < r * c; ++j) {
+                if (maze[i / c][i % c] == 'B' && maze[j / c][j % c] == 'B' &&
+                    maze[i / c][i % c] + maze[j / c][j % c] < maze[i / c][j % c]) {
+                    maze[i / c][j % c] = maze[i / c][i % c] + maze[j / c][j % c];
+                }
+            }
+        }
+    }
+}
+
+void Board::visualizeShortestPath(sf::RenderWindow& window, const vector<vector<char>>& maze, int r, int c) {
+    sf::Font font;
+    font.loadFromFile("arial.ttf"); // Replace with the path to a font file on your system
+
+    // Draw the maze
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            sf::RectangleShape cell(sf::Vector2f(tileSize, tileSize));
+            cell.setPosition(j * tileSize, i * tileSize);
+            cell.setOutlineColor(sf::Color::Black);
+            cell.setOutlineThickness(1);
+
+            // Draw the cell based on its content
+            if (maze[i][j] == 'S') {
+                cell.setFillColor(sf::Color::Green); // Start cell in green
+            }
+            else if (maze[i][j] == 'M') {
+                cell.setFillColor(sf::Color::Red); // End cell in red
+            }
+            else if (maze[i][j] == 'B') {
+                cell.setFillColor(sf::Color::White); // Floor cell in white
+            }
+            else if (maze[i][j] == 'C') {
+                cell.setFillColor(sf::Color::Black); // Wall cell in black
+            }
+
+            window.draw(cell);
+        }
+    }
+
+    // Draw the shortest path in blue
+    sf::VertexArray path(sf::LinesStrip);
+
+    // Find the start and end vertices
+    int startVertex = -1;
+    int endVertex = -1;
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            if (maze[i][j] == 'S') {
+                startVertex = i * c + j;
+            }
+            else if (maze[i][j] == 'M') {
+                endVertex = i * c + j;
+            }
+        }
+    }
+
+    // Add the shortest path vertices to the drawing
+    if (startVertex != -1 && endVertex != -1) {
+        path.append(sf::Vertex(sf::Vector2f((startVertex % c) * tileSize + tileSize/2, (startVertex / c) * tileSize + tileSize/2), sf::Color::Blue));
+
+        while (startVertex != endVertex) {
+            int nextVertex = -1;
+
+            // Check adjacent vertices
+            for (int i = 0; i < r * c; ++i) {
+                if (maze[startVertex / c][startVertex % c] == 'B' &&
+                    maze[i / c][i % c] == 'B' &&
+                    maze[startVertex / c][startVertex % c] + maze[i / c][i % c] == maze[startVertex / c][i % c]) {
+                    nextVertex = i;
+                    break;
+                }
+            }
+
+            if (nextVertex == -1) {
+                break; // No valid path found
+            }
+
+            // Add the next vertex to the path
+            path.append(sf::Vertex(sf::Vector2f((nextVertex % c) * tileSize + tileSize/2, (nextVertex / c) * tileSize + tileSize/2), sf::Color::Blue));
+            startVertex = nextVertex;
+        }
+    }
+
+    window.draw(path);
 }

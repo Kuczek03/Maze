@@ -21,16 +21,13 @@ public:
 	bool isValid(int x, int y, int r, int c);
 	void drawBoard(sf::RenderWindow& window, const vector<vector<char>>& board, const vector<string>& path);
 
-	//vector<vector<char>> generateRandomMaze(int r, int c);
-	//bool isAvailable(const vector<vector<char>>& maze, int x, int y, int r, int c);
-	//int countAvailableNeighbors(const vector<vector<char>>& maze, int x, int y);
-	//void generate(vector<vector<char>>& maze, int x, int y, mt19937& gen);
-
 	vector<vector<char>> generateMaze(int r, int c);
 	vector<vector<char>> generateMazeWithProbability(int r, int c, double wallProbability);
 
 	void cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
 	void addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
 	void addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
+	void floydWarshall(vector<vector<char>>& maze, int r, int c);
+	void visualizeShortestPath(sf::RenderWindow& window, const vector<vector<char>>& maze, int r, int c);
 };
 
