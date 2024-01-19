@@ -1,7 +1,7 @@
 #include "File.h"
 
 // Generating board form the file
-vector<vector<char>> File::loadBoardFromFile(const string& filename, int& m, int& n) 
+vector<vector<char>> File::loadBoardFromFile(const string& filename, int& r, int& c) 
 {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -9,11 +9,11 @@ vector<vector<char>> File::loadBoardFromFile(const string& filename, int& m, int
         exit(EXIT_FAILURE);
     }
 
-    file >> m >> n;
-    vector<vector<char>> board(m, vector<char>(n));
+    file >> r >> c;
+    vector<vector<char>> board(r, vector<char>(c));
 
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < n; ++j) {
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
             file >> board[i][j];
         }
     }
