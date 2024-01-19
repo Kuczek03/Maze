@@ -2,21 +2,21 @@
 using namespace std;
 
 // Cheching if coordinates are valid on board
-bool Board::isValid(int x, int y, int m, int n) 
+bool Board::isValid(int x, int y, int r, int c) 
 {
-    return x >= 0 && x < m && y >= 0 && y < n;
+    return x >= 0 && x < r && y >= 0 && y < c;
 }
 
 
 vector<string> Board::BFS(vector<vector<char>>& board) 
 {
     
-    int m = board.size(); // Number of rows
-    int n = board[0].size(); // Number od columns
-    vector<vector<bool>> visited(m, vector<bool>(n, false)); // Array of visited fields
+    int r = board.size(); // Number of rows
+    int c = board[0].size(); // Number od columns
+    vector<vector<bool>> visited(r, vector<bool>(c, false)); // Array of visited fields
 
     // First row of queue is starting points
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < c; ++i) {
         if (board[0][i] == 'B') {
             queue.push({ 0, i, {to_string(i + 1)} });
             visited[0][i] = true;
@@ -30,7 +30,7 @@ vector<string> Board::BFS(vector<vector<char>>& board)
         tie(x, y, path) = queue.front();
         queue.pop();
 
-        if (x == m - 1) {
+        if (x == r - 1) {
             // If we at last row we return path
             return path;
         }
@@ -44,7 +44,7 @@ vector<string> Board::BFS(vector<vector<char>>& board)
             int X = x + dx[i];
             int Y = y + dy[i];
 
-            if (isValid(X, Y, m, n) && !visited[X][Y] && board[X][Y] == 'B') {
+            if (isValid(X, Y, r, c) && !visited[X][Y] && board[X][Y] == 'B') {
                 visited[X][Y] = true;
                 vector<string> newPath = path;
                 newPath.push_back(directions[i]);
@@ -57,7 +57,7 @@ vector<string> Board::BFS(vector<vector<char>>& board)
     return {};
 }
 
-// Funkcja pomocnicza do sprawdzenia, czy dane pole jest dostêpne
+/*// Funkcja pomocnicza do sprawdzenia, czy dane pole jest dostêpne
 bool Board::isAvailable(const vector<vector<char>>& maze, int x, int y, int m, int n) {
     return x > 0 && x < m - 1 && y > 0 && y < n - 1 && maze[x][y] == 'C';
 }
@@ -107,7 +107,8 @@ vector<vector<char>> Board::generateRandomMaze(int m, int n) {
     generate(maze, startX, startY, gen);
 
     return maze;
-}
+}*/
+
 
 
 // Funkcja rysuj¹ca planszê w oknie SFML
@@ -187,23 +188,24 @@ void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& boar
     }
 }
 
-void Board::generateMaze(int o, int p) {
+vector<vector<char>> Board::generateMaze(int r, int c) {
     
-    srand(time(NULL)); // Seed for random number generator
+    srand(time(0)); // Seed for random number generator
 
     // Create a 2D array to represent the maze
-    char maze[1000][1000];
+    //char maze[200][200];
+    vector<vector<char>> maze(r, vector<char>(c));
 
     // Fill the maze with walls ("C")
-    for (int i = 0; i < o; ++i) {
-        for (int j = 0; j < p; ++j) {
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
             maze[i][j] = 'C';
         }
     }
 
     // Generate random floors ("B")
-    for (int i = 1; i < o - 1; ++i) {
-        for (int j = 1; j < p - 1; ++j) {
+    for (int i = 1; i < r - 1; ++i) {
+        for (int j = 1; j < c - 1; ++j) {
             // Randomly decide whether to make the cell a floor
             if (rand() % 2 == 0) {
                 maze[i][j] = 'B';
@@ -212,10 +214,51 @@ void Board::generateMaze(int o, int p) {
     }
 
     // Print the generated maze
-    for (int i = 0; i < o; ++i) {
-        for (int j = 0; j < p; ++j) {
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
             cout << maze[i][j] << " ";
         }
         cout << endl;
+    }
+    return maze;
+}
+
+vector<vector<char>> Board::generateMazeWithProbability(int r, int c, double wallProbability)
+{
+    srand(time(0)); // Seed for random number generator
+
+    // Create a 2D array to represent the maze
+    //char maze[200][200];
+    vector<vector<char>> maze(r, vector<char>(c));
+
+    // Fill the maze with walls ("C") based on user-defined probability
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            double randomValue = static_cast<double>(rand()) / RAND_MAX;
+            maze[i][j] = (randomValue < wallProbability) ? 'C' : 'B';
+        }
+    }
+
+    // Print the generated maze
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            cout << maze[i][j] << " ";
+        }
+        cout << endl;
+    }
+    return maze;
+}
+
+void Board::toggleCellFromFile(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& mazeFromFile) {
+    int row = mousePos.y / tileSize;
+    int col = mousePos.x / tileSize;
+
+    if (row >= 0 && row < r && col >= 0 && col < c) {
+        if (mazeFromFile[row][col] == 'B') {
+            mazeFromFile[row][col] = 'C';
+        }
+        else {
+            mazeFromFile[row][col] = 'B';
+        }
     }
 }
