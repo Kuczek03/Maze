@@ -36,7 +36,6 @@ void Window::mazeFromFile(const string& filename, const string& outname)
 
 void Window::randomGeneratedMaze(const string& filename, const string& outname)
 {
-    
 
     // Loading the board
     vector<vector<char>> maze = file.loadBoardFromFile(filename, m, n);

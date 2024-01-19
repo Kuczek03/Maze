@@ -24,5 +24,7 @@ public:
 	bool isAvailable(const vector<vector<char>>& maze, int x, int y, int m, int n);
 	int countAvailableNeighbors(const vector<vector<char>>& maze, int x, int y);
 	void generate(vector<vector<char>>& maze, int x, int y, mt19937& gen);
+
+	void generateMaze(int o, int p);
 };
 

@@ -186,3 +186,36 @@ void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& boar
         }
     }
 }
+
+void Board::generateMaze(int o, int p) {
+    
+    srand(time(NULL)); // Seed for random number generator
+
+    // Create a 2D array to represent the maze
+    char maze[1000][1000];
+
+    // Fill the maze with walls ("C")
+    for (int i = 0; i < o; ++i) {
+        for (int j = 0; j < p; ++j) {
+            maze[i][j] = 'C';
+        }
+    }
+
+    // Generate random floors ("B")
+    for (int i = 1; i < o - 1; ++i) {
+        for (int j = 1; j < p - 1; ++j) {
+            // Randomly decide whether to make the cell a floor
+            if (rand() % 2 == 0) {
+                maze[i][j] = 'B';
+            }
+        }
+    }
+
+    // Print the generated maze
+    for (int i = 0; i < o; ++i) {
+        for (int j = 0; j < p; ++j) {
+            cout << maze[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
