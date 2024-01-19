@@ -29,6 +29,8 @@ public:
 	vector<vector<char>> generateMaze(int r, int c);
 	vector<vector<char>> generateMazeWithProbability(int r, int c, double wallProbability);
 
-	void toggleCellFromFile(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& mazeFromFile);
+	void cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
+	void addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
+	void addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
 };
 

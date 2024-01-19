@@ -21,19 +21,23 @@ void Window::mazeFromFile(const string& filename, const string& outname)
 
     // Window loop
     while (window->isOpen()) {
-        sf::Event event;
+        sf::Event ev;
         
-        while (window->pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+        while (window->pollEvent(ev)) {
+            if (ev.type == sf::Event::Closed) {
                 window->close();
             }
-            else if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                    board.toggleCellFromFile(r, c, mousePos, maze);
-    
-                    
-                }
+            else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+                board.cellChange(r, c, mousePos, maze);                                    
+            }
+            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::S) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+                board.addStartPoint(r, c, mousePos, maze);
+            }
+            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+                board.addEndPoint(r, c, mousePos, maze);
             }
         }
  
@@ -50,21 +54,26 @@ void Window::drawMaze(const string& outname, int choice, int r, int c)
     vector<vector<char>> maze = board.generateMaze(r, c);
     vector<string> path = board.BFS(maze);
     window->create(sf::VideoMode(c * tileSize, r * tileSize), "Random generated maze");
+    
 
     while (window->isOpen()) {
-        sf::Event event;
+        sf::Event ev;
 
-        while (window->pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+        while (window->pollEvent(ev)) {
+            if (ev.type == sf::Event::Closed) {
                 window->close();
             }
-            else if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                    board.toggleCellFromFile(r, c, mousePos, maze);
-
-
-                }
+            else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) { 
+                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+                board.cellChange(r, c, mousePos, maze);
+            }
+            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::S) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+                board.addStartPoint(r, c, mousePos, maze);
+            }
+            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+                board.addEndPoint(r, c, mousePos, maze);
             }
         }
 

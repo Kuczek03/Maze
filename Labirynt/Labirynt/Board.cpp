@@ -134,6 +134,12 @@ void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& boar
             else if (board[i][j] == 'C') {
                 tile.setFillColor(sf::Color::Black);
             }
+            else if (board[i][j] == 'S') {
+                tile.setFillColor(sf::Color::Green);
+            }
+            else if (board[i][j] == 'M') {
+                tile.setFillColor(sf::Color::Red);
+            }
 
             window.draw(tile);
         }
@@ -249,16 +255,53 @@ vector<vector<char>> Board::generateMazeWithProbability(int r, int c, double wal
     return maze;
 }
 
-void Board::toggleCellFromFile(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& mazeFromFile) {
+void Board::cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze) {
     int row = mousePos.y / tileSize;
     int col = mousePos.x / tileSize;
 
     if (row >= 0 && row < r && col >= 0 && col < c) {
-        if (mazeFromFile[row][col] == 'B') {
-            mazeFromFile[row][col] = 'C';
+        if (maze[row][col] != 'S' && maze[row][col] != 'M') {
+            if (maze[row][col] == 'B') {
+                maze[row][col] = 'C';
+            }
+            else {
+                maze[row][col] = 'B';
+            }
         }
-        else {
-            mazeFromFile[row][col] = 'B';
+    }
+}
+
+void Board::addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze) {
+    int row = mousePos.y / tileSize;
+    int col = mousePos.x / tileSize;
+
+    if (row >= 0 && row < r && col >= 0 && col < c) {
+        for (int i = 0; i < r; ++i) {
+            for (int j = 0; j < c; ++j) {
+                if (maze[i][j] == 'S') {
+                    maze[i][j] = 'B';
+                }
+            }
         }
+        if (maze[row][col] != 'M')
+            maze[row][col] = 'S';
+    }
+}
+
+void Board::addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze)
+{
+    int row = mousePos.y / tileSize;
+    int col = mousePos.x / tileSize;
+
+    if (row >= 0 && row < r && col >= 0 && col < c) {
+        for (int i = 0; i < r; ++i) {
+            for (int j = 0; j < c; ++j) {
+                if (maze[i][j] == 'M') {
+                    maze[i][j] = 'B';
+                }
+            }
+        }
+        if(maze[row][col] != 'S')
+            maze[row][col] = 'M';
     }
 }
