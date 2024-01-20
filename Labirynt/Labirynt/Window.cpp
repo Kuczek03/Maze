@@ -15,7 +15,7 @@ void Window::mazeFromFile(const string& filename, const string& outname)
     }
 
     // Solving labirinth
-    vector<string> path = board.BFS(maze);
+    vector<string> path = board.AStar(maze);
 
     window->create(sf::VideoMode(c * tileSize, r * tileSize), "Maze from the file");
     
@@ -29,7 +29,7 @@ void Window::mazeFromFile(const string& filename, const string& outname)
             }
             else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                board.cellChange(r, c, mousePos, maze);                                    
+                board.cellChange(r, c, mousePos, maze);
             }
             else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::S) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
@@ -38,16 +38,23 @@ void Window::mazeFromFile(const string& filename, const string& outname)
             else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
                 board.addEndPoint(r, c, mousePos, maze);
+            }else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::R) {
+               // vector<string> path = board.AStar(maze);
+                //file.saveSolution(outname, path);
+                //file.readAndUpdatePathFromFile(outname, maze);
+                board.updateBoardd(*window, path, maze);
             }
         }
  
         window->clear();
 
-        board.drawBoard(*window, maze, path);
-        
+        board.drawBoard(*window, maze, path, r,c);
+        //board.updateBoardd(*window, path, maze);
+        //board.visualizeShortestPath(*window, maze, r, c);
         window->display();
     }
-    file.saveSolution(outname, path);
+    vector<string> newPath = board.AStar(maze);
+    file.saveSolution(outname, newPath);
 }
 
 void Window::drawMaze(const string& outname, int choice, int r, int c)
@@ -85,40 +92,6 @@ void Window::drawMaze(const string& outname, int choice, int r, int c)
         board.visualizeShortestPath(*window, maze, r, c);
         window->display();
     }
-    //file.saveSolution(outname, path);
+    //vector<string> newPath = board.AStar(maze);
+    //file.saveSolution(outname, newPath);
 }
-
-/*void Window::randomGeneratedMaze(const string & filename, const string & outname)
-{
-
-    // Loading the board
-    vector<vector<char>> maze = file.loadBoardFromFile(filename, m, n);
-
-    // Returning board
-    cout << "Board:" << endl;
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < n; ++j) {
-            cout << maze[i][j] << " ";
-        }
-        cout << endl;
-    }
-
-    // Solving labirinth
-    vector<string> path = board.BFS(maze);
-
-    sf::RenderWindow window(sf::VideoMode(n * 40, m * 40), "Labirynt");
-
-    // Window loop
-    while (window.isOpen()) {
-        sf::Event event;
-
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-        window.clear();
-        board.drawBoard(window, maze, path);
-        window.display();
-    }
-    file.saveSolution(outname, path);
-}*/

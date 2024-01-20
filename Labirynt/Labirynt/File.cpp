@@ -34,7 +34,7 @@ int File::saveSolution(const string& outname, vector<string> path)
         outputFile << "There is no solution." << endl;
     }
     else {
-        outputFile << "Here is the solution:  ";
+        outputFile << "Here is the solution:\n";
         for (const string& direction : path) {
             outputFile << direction << endl;
         }
@@ -46,4 +46,53 @@ int File::saveSolution(const string& outname, vector<string> path)
     cout << "Solution saved in file " << outname << "." << endl;
 
     return 1;
+}
+
+void File::readAndUpdatePathFromFile(const string& filePath, vector<vector<char>> board)
+{
+    ifstream file(filePath);
+
+    if (!file.is_open())
+    {
+        cerr << "Error opening file: " << filePath << endl;
+        return;
+    }
+
+    string direction;
+    int x = 0, y = 0;  // Starting position
+
+    while (file >> direction)
+    {
+        // Convert the direction to lowercase
+        std::transform(direction.begin(), direction.end(), direction.begin(), ::tolower);
+
+        // Check if the movement is valid and not affecting 'S' or 'M'
+        if (direction == "Up" && x > 0 && board[x - 1][y] == 'B')
+        {
+            // Override 'B' with 'b'
+            board[x - 1][y] = 'b';
+            x--;
+        }
+        else if (direction == "Down" && x < board.size() - 1 && board[x + 1][y] == 'B')
+        {
+            // Override 'B' with 'b'
+            board[x + 1][y] = 'b';
+            x++;
+        }
+        else if (direction == "L" && y > 0 && board[x][y - 1] == 'B')
+        {
+            // Override 'B' with 'b'
+            board[x][y - 1] = 'b';
+            y--;
+        }
+        else if (direction == "Rigth" && y < board[0].size() - 1 && board[x][y + 1] == 'B')
+        {
+            // Override 'B' with 'b'
+            board[x][y + 1] = 'b';
+            y++;
+        }
+        // Ignore invalid directions
+    }
+
+    file.close();
 }
