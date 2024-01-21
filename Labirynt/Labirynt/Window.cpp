@@ -18,7 +18,7 @@ void Window::mazeFromFile(const string& filename, const string& outname)
     vector<string> path = board.AStar(maze);
 
     window->create(sf::VideoMode(c * tileSize, r * tileSize), "Maze from the file");
-    
+
     // Window loop
     while (window->isOpen()) {
         sf::Event ev;
@@ -29,38 +29,65 @@ void Window::mazeFromFile(const string& filename, const string& outname)
             }
             else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+                board.updateBoardWithMouseClick(mousePos, maze);
                 board.cellChange(r, c, mousePos, maze);
+                
             }
             else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::S) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                board.addStartPoint(r, c, mousePos, maze);
+                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);               
+                board.addStartPoint(r, c, mousePos, maze);                             
             }
             else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
                 board.addEndPoint(r, c, mousePos, maze);
-            }else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::R) {
-               // vector<string> path = board.AStar(maze);
-                //file.saveSolution(outname, path);
-                //file.readAndUpdatePathFromFile(outname, maze);
-                board.updateBoardd(*window, path, maze);
+                
+            }
+            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::R) {
+                // vector<string> path = board.AStar(maze);
+                 //file.saveSolution(outname, path);
+                 //file.readAndUpdatePathFromFile(outname, maze);
+                 //board.updateBoardd(*window, path, maze);
+
             }
         }
- 
-        window->clear();
 
-        board.drawBoard(*window, maze, path, r,c);
-        //board.updateBoardd(*window, path, maze);
-        //board.visualizeShortestPath(*window, maze, r, c);
-        window->display();
+        window->clear();
+        
+
+        // Draw the board with all paths
+        
+        
+        if (board.hasBoardModified()) {
+            // Redraw the updated board
+
+            path = board.AStar(maze);
+           
+            board.updateAllBtoB(maze, r, c);
+            board.drawBoard(*window, maze, path, r, c);
+            
+            board.resetBoardModified();
+            window->display();
+
+            
+        }
+        
+        board.drawBoard(*window, maze, path, r, c);
+        
+        /*if (board.hasPathChanged(path)) {
+            // Update the path and redraw it
+            //board.updatePath(path);
+            //board.drawBoard(*window,maze, path,r,c);
+        }*/
+        
     }
-    vector<string> newPath = board.AStar(maze);
-    file.saveSolution(outname, newPath);
-}
+        vector<string> newPath = board.AStar(maze);
+        file.saveSolution(outname, newPath);
+    }
 
 void Window::drawMaze(const string& outname, int choice, int r, int c)
 {
     vector<vector<char>> maze = board.generateMaze(r, c);
-    //vector<string> path = board.BFS(maze);
+    vector<string> path = board.AStar(maze);
     window->create(sf::VideoMode(c * tileSize, r * tileSize), "Random generated maze");
     
     
@@ -88,8 +115,8 @@ void Window::drawMaze(const string& outname, int choice, int r, int c)
 
         window->clear();
         //board.drawBoard(*window, maze, path);
-        board.floydWarshall(maze, r, c);
-        board.visualizeShortestPath(*window, maze, r, c);
+        //board.floydWarshall(maze, r, c);
+        //board.visualizeShortestPath(*window, maze, r, c);
         window->display();
     }
     //vector<string> newPath = board.AStar(maze);

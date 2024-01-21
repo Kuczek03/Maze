@@ -28,7 +28,7 @@ private:
 		}
 	};
 
-	vector<string> path;
+	
 	queue<tuple<int, int, vector<string>>> queue; // BFS queue
 	
 	const int tileSize = 40;
@@ -38,48 +38,46 @@ private:
 		return abs(x1 - x2) + abs(y1 - y2);
 	}
 
-	bool boardModified;
+	
+	bool isBoardModified = true;
+	
+	vector<string> lastPath, pathh;
 
-	vector<string> lastShortestPath; // Variable to store the last shortest path
+	
 
-	void updateBoardInternal(sf::RenderWindow& window, const vector<string>& path, vector<vector<char>>& board);
 public:
+	vector<vector<char>> brd;
 	vector<string> BFS(vector<vector<char>>& board);
 
 	bool isValid(int x, int y, int r, int c);
-	void drawBoard(sf::RenderWindow& window, const vector<vector<char>>& board, const vector<string>& path, int r, int c);
+	void drawBoard(sf::RenderWindow& window,  vector<vector<char>>& board,  
+					vector<string>& path, int r, int c);
+	void updateBoardWithMouseClick(sf::Vector2i mousePos, vector<vector<char>>& maze);
 
+	// Function to set the modification status to true
+	void setBoardModified() { isBoardModified = true; }
+
+	// Function to check if the board has been modified
+	vector<vector<char>> setPathChar(vector<vector<char>>& board, vector<string>& path);
+	bool hasBoardModified() const {	return isBoardModified;}
+	void updateAllBtoB(vector<vector<char>>& maze, int r, int c);
+	
+	
 	vector<vector<char>> generateMaze(int r, int c);
 	vector<vector<char>> generateMazeWithProbability(int r, int c, double wallProbability);
 
 	void cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
 	void addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
 	void addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
-	void floydWarshall(vector<vector<char>>& maze, int r, int c);
-	void visualizeShortestPath(sf::RenderWindow& window, const vector<vector<char>>& maze, int r, int c);
-
+	
 	vector<string> AStar(vector<vector<char>>& board);
 
-	// Upadating the board
-	Board() : boardModified(false) {}
-	// Function to get the status of board modification
-	bool isBoardModified() const{return boardModified;}
 	// Function to reset the board modification status
-	void resetBoardModified(){boardModified = false;}
-	void updateBoard(sf::RenderWindow& window, const vector<string>& path, vector<vector<char>>& board);
-	
-	// Function to get the last shortest path
-	const vector<string>& getLastShortestPath() const
-	{
-		return lastShortestPath;
-	}
+	void resetBoardModified(){isBoardModified = false;}		
 
-	// Function to update the board and store the current path as the last path
-	void updateBoardd(sf::RenderWindow& window, const vector<string>& path, vector<vector<char>>& board)
-	{
-		// Update the board and set the last path
-		lastShortestPath = path;
-		updateBoardInternal(window, path, board);
-	}
-	};
+	vector<vector<string>> AStarWithAllPaths(vector<vector<char>>& board);
+	int updateStartAndEndPoints(vector<vector<char>>& board);
+	vector<vector<string>> getShortestPaths(vector<vector<char>>& board, int r, int c);
+	void drawBoardAllPaths(sf::RenderWindow& window, vector<vector<char>>& board, const vector<string>& path, const vector<vector<string>>& allPaths, int r, int c);
+};
 

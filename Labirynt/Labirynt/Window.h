@@ -10,6 +10,7 @@ private:
 	const int tileSize = 40;
 
 	sf::RenderWindow* window= new sf::RenderWindow;
+	bool isStartModified = true;
 public:
 	void mazeFromFile(const string& filename, const string& outname);
 	//void randomGeneratedMaze(const string& filename, const string& outname);
