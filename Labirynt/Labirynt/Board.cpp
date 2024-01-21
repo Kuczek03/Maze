@@ -7,8 +7,7 @@ bool Board::isValid(int x, int y, int r, int c)
     return x >= 0 && x < r && y >= 0 && y < c;
 }
 
-
-vector<string> Board::BFS(vector<vector<char>>& board) 
+/*vector<string> Board::BFS(vector<vector<char>>& board) 
 {
     
     int r = board.size(); // Number of rows
@@ -27,12 +26,12 @@ vector<string> Board::BFS(vector<vector<char>>& board)
     while (!queue.empty()) {
         int x, y;
         
-        tie(x, y, path) = queue.front();
+        tie(x, y, pathh) = queue.front();
         queue.pop();
 
         if (x == r - 1) {
             // If we at last row we return path
-            return path;
+            return pathh;
         }
 
         // Possible moves: up, down, left, rigth
@@ -46,7 +45,7 @@ vector<string> Board::BFS(vector<vector<char>>& board)
 
             if (isValid(X, Y, r, c) && !visited[X][Y] && board[X][Y] == 'B') {
                 visited[X][Y] = true;
-                vector<string> newPath = path;
+                vector<string> newPath = pathh;
                 newPath.push_back(directions[i]);
                 queue.push({ X, Y, newPath });
             }
@@ -55,25 +54,70 @@ vector<string> Board::BFS(vector<vector<char>>& board)
 
     // If there is no path found, return empty list.
     return {};
-}
+}*/
+
 
 // Funkcja rysuj¹ca planszê w oknie SFML
-void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& board, const vector<string>& path) 
-{
-    /*sf::Font font;
-    if (!font.loadFromFile("arial.ttf")) {
-        cerr << "Cannot load the font. " << endl;
-        exit(EXIT_FAILURE);
-    }*/
+void Board::drawBoard(sf::RenderWindow& window, vector<vector<char>>& board, vector<string>& path, int r, int c)
+{    
+    // Check if 'S' or 'M' has changed
+    int x = 0, y = 0;
+    bool isStartChanged = false;
+    bool isEndChanged = false;
 
-    for (size_t i = 0; i < board.size(); ++i) {
-        for (size_t j = 0; j < board[i].size(); ++j) {
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            if (board[i][j] == 'S' && std::find(lastPath.begin(), lastPath.end(), "S") == lastPath.end()) {
+                isStartChanged = true;
+            }
+            else if (board[i][j] == 'M' && std::find(lastPath.begin(), lastPath.end(), "M") == lastPath.end()) {
+                isEndChanged = true;
+            }
+        }
+    }   
+    // If 'S' or 'M' has changed, update the path
+    if (isStartChanged || isEndChanged) {
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++)
+                if (board[i][j] == 'S') {
+                    x = j;
+                    y = i;
+                }
+        path = AStar(board);                
+    }  
+    // Draw the current path by changing 'B' to 'b'
+    for (const string& direction : path) {
+        if (direction == "Up") {
+            y--;
+        }
+        else if (direction == "Down") {
+            y++;
+        }
+        else if (direction == "Left") {
+            x--;
+        }
+        else if (direction == "Right") {
+            x++;
+        }
+        else {
+            cerr << "Error. Unknown direction on path" << endl;
+            exit(EXIT_FAILURE);
+        }
+
+        // Change 'B' to 'b' in the maze
+        if (board[y][x] == 'B') {
+            board[y][x] = 'b';
+        }
+    }
+    
+    // Draw the maze
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
             sf::RectangleShape tile(sf::Vector2f(tileSize, tileSize));
             tile.setOutlineThickness(2);
             tile.setOutlineColor(sf::Color::Black);
             tile.setPosition(j * tileSize, i * tileSize);
-
-
+            // Set color based on board content
             if (board[i][j] == 'B') {
                 tile.setFillColor(sf::Color::White);
             }
@@ -86,25 +130,32 @@ void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& boar
             else if (board[i][j] == 'M') {
                 tile.setFillColor(sf::Color::Red);
             }
-
+            else if (board[i][j] == 'b') {
+                tile.setFillColor(sf::Color::Blue);
+            }                            
             window.draw(tile);
         }
+    }    
+}
+
+
+void Board::updateBoardWithMouseClick(sf::Vector2i mousePos, vector<vector<char>>& maze) {
+    int row = mousePos.y / tileSize;
+    int col = mousePos.x / tileSize;
+
+    if (row >= 0 && row < maze.size() && col >= 0 && col < maze[0].size()) {
+        if (maze[row][col] == 'b') {
+            maze[row][col] = 'B';
+            setBoardModified();  // Set the modification status to true
+        }
     }
+    
+}
 
-    /*// Draw the path
-    for (size_t i = 0; i < path.size(); ++i) {
-        sf::Text text(path[i], font, 20);
-        text.setPosition(i * tileSize, board.size() * tileSize);
-        window.draw(text);
-    }*/
-    /*// Zamaluj znalezion¹ œcie¿kê na zielono
-    int x = 0;
-    int y = 0;
-
-    sf::RectangleShape pathTile(sf::Vector2f(tileSize, tileSize));
-    pathTile.setFillColor(sf::Color::Green);
-
-    for (const string& direction : path) {
+vector<vector<char>> Board::setPathChar(vector<vector<char>>& board, vector<string>& path)
+{
+    int x = 0, y = 0;
+    for (string& direction : path) {
         if (direction == "Up") {
             y--;
         }
@@ -114,30 +165,32 @@ void Board::drawBoard(sf::RenderWindow& window, const vector<vector<char>>& boar
         else if (direction == "Left") {
             x--;
         }
-        else if (direction == "Rigth") {
+        else if (direction == "Right") {
             x++;
         }
         else {
-            cerr << "Error. Unown direction on path" << endl;
+            cerr << "Error. Unknown direction on path" << endl;
             exit(EXIT_FAILURE);
         }
 
-        pathTile.setPosition(x * tileSize, y * tileSize);
-        window.draw(pathTile);
-    }*/
-    
-
-    // Set starting point as cyan square
-    for (size_t j = 0; j < board[0].size(); ++j) {
-        if (board[0][j] == 'B') {
-            sf::RectangleShape startTile(sf::Vector2f(tileSize, tileSize));
-            startTile.setOutlineThickness(2);
-            startTile.setOutlineColor(sf::Color::Black);
-            startTile.setPosition(j * tileSize, 0);
-            startTile.setFillColor(sf::Color::Cyan);
-            window.draw(startTile);
+        // Change 'B' to 'b' in the maze
+        if (board[y][x] == 'B') {
+            board[y][x] = 'b';
         }
     }
+    return board;
+}
+
+void Board::updateAllBtoB(vector<vector<char>>& maze, int r, int c)
+{
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            if (maze[i][j] == 'b') {
+                maze[i][j] = 'B';
+            }
+        }
+    }
+    isBoardModified = false;  // Reset the modification status
 }
 
 vector<vector<char>> Board::generateMaze(int r, int c) {
@@ -192,7 +245,7 @@ vector<vector<char>> Board::generateMazeWithProbability(int r, int c, double wal
     // Print the generated maze
     for (int i = 0; i < r; ++i) {
         for (int j = 0; j < c; ++j) {
-            cout << maze[i][j] << " ";
+            cout << maze[i][j];
         }
         cout << endl;
     }
@@ -212,6 +265,7 @@ void Board::cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>
                 maze[row][col] = 'B';
             }
         }
+        setBoardModified();
     }
 }
 
@@ -229,6 +283,10 @@ void Board::addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<cha
         }
         if (maze[row][col] != 'M')
             maze[row][col] = 'S';
+        if(maze[row][col]=='b'){
+            maze[row][col] = 'S';
+        }
+        setBoardModified();
     }
 }
 
@@ -245,132 +303,270 @@ void Board::addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>
                 }
             }
         }
-        if(maze[row][col] != 'S')
+        if (maze[row][col] != 'S')
             maze[row][col] = 'M';
+        setBoardModified();
     }
 }
 
-void Board::floydWarshall(vector<vector<char>>& maze, int r, int c) {
-    // Set start vertex to "S" if not provided
+vector<string> Board::AStar(vector<vector<char>>& board)
+{
+    int r = board.size();
+    int c = board[0].size();
+
+    // Helper function to calculate Manhattan distance
+    auto calculateManhattanDistance = [](int x1, int y1, int x2, int y2) {
+        return std::abs(x1 - x2) + std::abs(y1 - y2);
+        };
+
+    // Priority queue to store nodes with the lowest f value on top
+    auto comparator = [](Node* a, Node* b) {
+        return a->getF() > b->getF();
+        };
+
+    priority_queue<Node*, vector<Node*>, decltype(comparator)> pq(comparator);
+
+    // Create a 2D array to store costs (g values)
+    vector<vector<int>> costs(r, vector<int>(c, INT_MAX));
+
+    // Find the start and end points
+    int startX, startY, endX, endY;
     bool hasStart = false;
+    bool hasEnd = false;
+
+    for (int i = 0; i < r; ++i)
+    {
+        for (int j = 0; j < c; ++j)
+        {
+            if (board[i][j] == 'S')
+            {
+                startX = i;
+                startY = j;
+                hasStart = true;
+            }
+            else if (board[i][j] == 'M')
+            {
+                endX = i;
+                endY = j;
+                hasEnd = true;
+            }
+        }
+    }
+    // If there is no 'S', create it in the first row and first column
+    if (!hasStart)
+    {
+        board[0][0] = 'S';
+        startX = 0;
+        startY = 0;
+    }
+
+    // If there is no 'M', create it in the last row and last column
+    if (!hasEnd)
+    {
+        board[r - 1][c - 1] = 'M';
+        endX = r - 1;
+        endY = c - 1;
+    }
+         
+    // Initialize the start node and add it to the priority queue
+    Node* startNode = new Node(startX, startY, 0, calculateManhattanDistance(startX, startY, endX, endY), nullptr);
+    pq.push(startNode);
+    costs[startX][startY] = 0;
+
+    // Possible moves: up, down, left, right
+    int dx[] = { -1, 1, 0, 0 };
+    int dy[] = { 0, 0, -1, 1 };
+    string directions[] = { "Up", "Down", "Left", "Right" };
+
+    while (!pq.empty())
+    {
+        Node* current = pq.top();
+        pq.pop();
+
+        // Goal check
+        if (current->x == endX && current->y == endY)
+        {
+            // Reconstruct the path
+            vector<string> path;
+            while (current->parent != nullptr)
+            {
+                for (int i = 0; i < 4; ++i)
+                {
+                    if (current->parent->x + dx[i] == current->x && current->parent->y + dy[i] == current->y)
+                    {
+                        path.push_back(directions[i]);
+                        break;
+                    }
+                }
+                current = current->parent;
+            }
+            // Reverse the path to get it from start to end
+            reverse(path.begin(), path.end());
+            return path;
+        }
+
+        // Explore neighbors
+        for (int i = 0; i < 4; ++i)
+        {
+            int nextX = current->x + dx[i];
+            int nextY = current->y + dy[i];
+
+            if (isValid(nextX, nextY, r, c) &&
+                board[nextX][nextY] != 'C' &&  // Cannot go through walls
+                costs[nextX][nextY] > current->g + 1)  // New path is cheaper
+            {
+                costs[nextX][nextY] = current->g + 1;
+                Node* nextNode = new Node(nextX, nextY, current->g + 1, calculateManhattanDistance(nextX, nextY, endX, endY), current);
+                pq.push(nextNode);
+            }
+        }
+    }
+
+    // No path found
+    return {};
+}
+
+
+vector<vector<string>> Board::findAllPaths(vector<vector<char>>& board) {
+    int m = board.size();
+    int n = board[0].size();
+    vector<vector<bool>> visited(m, vector<bool>(n, false));
+    queue<tuple<int, int, vector<string>>> q;
+
+    // Initialize the queue
+    for (int i = 0; i < n; ++i) {
+        if (board[0][i] == 'B') {
+            q.push({0, i, {to_string(i + 1)}});
+            visited[0][i] = true;
+        }
+    }
+
+    vector<vector<string>> shortestPaths;
+    int minPathLength = INT_MAX;
+
+    while (!q.empty()) {
+        int x, y;
+        vector<string> path;
+        tie(x, y, path) = q.front();
+        q.pop();
+
+        // Check if reached the end of the maze
+        if (x == m - 1) {
+            if (path.size() < minPathLength) {
+                minPathLength = path.size();
+                shortestPaths.clear();
+            }
+            if (path.size() == minPathLength) {
+                shortestPaths.push_back(path);
+            }
+            continue;
+        }
+
+        int dx[] = {-1, 1, 0, 0};
+        int dy[] = {0, 0, -1, 1};
+        string directions[] = {"Up", "Down", "Left", "Right"};
+
+        for (int i = 0; i < 4; ++i) {
+            int newX = x + dx[i];
+            int newY = y + dy[i];
+
+            if (isValid(newX, newY, m, n) && !visited[newX][newY] &&
+                (board[newX][newY] == 'B' || board[newX][newY] == 'M')) {
+                visited[newX][newY] = true;
+                vector<string> newPath = path;
+                newPath.push_back(directions[i]);
+                q.push({newX, newY, newPath});
+            }
+        }
+    }
+
+    return shortestPaths;
+}
+
+void Board::drawAllBoard(sf::RenderWindow& window, vector<vector<char>>& board, const vector<vector<string>>& allPaths, int r, int c)
+{
+    // Find or create 'S' and 'M' positions
+    int startRow = -1, startCol = -1;
+    int endRow = -1, endCol = -1;
+
+    
+    // If 'S' does not exist, create it at the first row and column
+    if (startRow == -1 || startCol == -1) {
+        startRow = 0;
+        startCol = 0;
+        board[startRow][startCol] = 'S';
+    }
+
+    // If 'M' does not exist, create it at the last row and column
+    if (endRow == -1 || endCol == -1) {
+        endRow = r - 1;
+        endCol = c - 1;
+        board[endRow][endCol] = 'M';
+    }
     for (int i = 0; i < r; ++i) {
         for (int j = 0; j < c; ++j) {
-            if (maze[i][j] == 'S') {
-                hasStart = true;
-                break;
+            if (board[i][j] == 'S') {
+                startRow = i;
+                startCol = j;
             }
-        }
-        if (hasStart) {
-            break;
-        }
-    }
-    if (!hasStart) {
-        maze[0][0] = 'S';
-    }
-
-    // Set end vertex to "M" if not provided
-    bool hasEnd = false;
-    for (int i = r - 1; i >= 0; --i) {
-        for (int j = c - 1; j >= 0; --j) {
-            if (maze[i][j] == 'M') {
-                hasEnd = true;
-                break;
-            }
-        }
-        if (hasEnd) {
-            break;
-        }
-    }
-    if (!hasEnd) {
-        maze[r - 1][c - 1] = 'M';
-    }
-
-    // Main algorithm
-    for (int k = 0; k < r * c; ++k) {
-        for (int i = 0; i < r * c; ++i) {
-            for (int j = 0; j < r * c; ++j) {
-                if (maze[i / c][i % c] == 'B' && maze[j / c][j % c] == 'B' &&
-                    maze[i / c][i % c] + maze[j / c][j % c] < maze[i / c][j % c]) {
-                    maze[i / c][j % c] = maze[i / c][i % c] + maze[j / c][j % c];
-                }
+            else if (board[i][j] == 'M') {
+                endRow = i;
+                endCol = j;
             }
         }
     }
-}
 
-void Board::visualizeShortestPath(sf::RenderWindow& window, const vector<vector<char>>& maze, int r, int c) {
-    sf::Font font;
-    font.loadFromFile("arial.ttf"); // Replace with the path to a font file on your system
+    // Update the maze with paths
+    for (size_t pathIndex = 0; pathIndex < allPaths.size(); ++pathIndex) {
+        const vector<string>& path = allPaths[pathIndex];
+        int x = 0, y = 0;  // Initialize position
+
+        for (const string& direction : path) {
+            if (direction == "Up") {
+                y--;
+            }
+            else if (direction == "Down") {
+                y++;
+            }
+            else if (direction == "Left") {
+                x--;
+            }
+            else if (direction == "Right") {
+                x++;
+            }
+
+            // Change 'B' to 'b' in the maze
+            if (board[y][x] == 'B') {
+                board[y][x] = 'b';
+            }
+        }
+    }
 
     // Draw the maze
     for (int i = 0; i < r; ++i) {
         for (int j = 0; j < c; ++j) {
-            sf::RectangleShape cell(sf::Vector2f(tileSize, tileSize));
-            cell.setPosition(j * tileSize, i * tileSize);
-            cell.setOutlineColor(sf::Color::Black);
-            cell.setOutlineThickness(1);
+            sf::RectangleShape tile(sf::Vector2f(tileSize, tileSize));
+            tile.setOutlineThickness(2);
+            tile.setOutlineColor(sf::Color::Black);
+            tile.setPosition(j * tileSize, i * tileSize);
 
-            // Draw the cell based on its content
-            if (maze[i][j] == 'S') {
-                cell.setFillColor(sf::Color::Green); // Start cell in green
+            // Set color based on board content
+            if (board[i][j] == 'B') {
+                tile.setFillColor(sf::Color::White);
             }
-            else if (maze[i][j] == 'M') {
-                cell.setFillColor(sf::Color::Red); // End cell in red
+            else if (board[i][j] == 'C') {
+                tile.setFillColor(sf::Color::Black);
             }
-            else if (maze[i][j] == 'B') {
-                cell.setFillColor(sf::Color::White); // Floor cell in white
+            else if (board[i][j] == 'S') {
+                tile.setFillColor(sf::Color::Green);
             }
-            else if (maze[i][j] == 'C') {
-                cell.setFillColor(sf::Color::Black); // Wall cell in black
+            else if (board[i][j] == 'M') {
+                tile.setFillColor(sf::Color::Red);
             }
-
-            window.draw(cell);
+            else if (board[i][j] == 'b') {
+                tile.setFillColor(sf::Color::Blue);
+            }
+            window.draw(tile);
         }
     }
-
-    // Draw the shortest path in blue
-    sf::VertexArray path(sf::LinesStrip);
-
-    // Find the start and end vertices
-    int startVertex = -1;
-    int endVertex = -1;
-    for (int i = 0; i < r; ++i) {
-        for (int j = 0; j < c; ++j) {
-            if (maze[i][j] == 'S') {
-                startVertex = i * c + j;
-            }
-            else if (maze[i][j] == 'M') {
-                endVertex = i * c + j;
-            }
-        }
-    }
-
-    // Add the shortest path vertices to the drawing
-    if (startVertex != -1 && endVertex != -1) {
-        path.append(sf::Vertex(sf::Vector2f((startVertex % c) * tileSize + tileSize/2, (startVertex / c) * tileSize + tileSize/2), sf::Color::Blue));
-
-        while (startVertex != endVertex) {
-            int nextVertex = -1;
-
-            // Check adjacent vertices
-            for (int i = 0; i < r * c; ++i) {
-                if (maze[startVertex / c][startVertex % c] == 'B' &&
-                    maze[i / c][i % c] == 'B' &&
-                    maze[startVertex / c][startVertex % c] + maze[i / c][i % c] == maze[startVertex / c][i % c]) {
-                    nextVertex = i;
-                    break;
-                }
-            }
-
-            if (nextVertex == -1) {
-                break; // No valid path found
-            }
-
-            // Add the next vertex to the path
-            path.append(sf::Vertex(sf::Vector2f((nextVertex % c) * tileSize + tileSize/2, (nextVertex / c) * tileSize + tileSize/2), sf::Color::Blue));
-            startVertex = nextVertex;
-        }
-    }
-
-    window.draw(path);
 }

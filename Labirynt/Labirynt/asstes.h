@@ -7,4 +7,5 @@
 #include <string>
 #include <locale.h>
 #include <random>
+#include <cmath>
 using namespace std;
