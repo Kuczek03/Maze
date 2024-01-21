@@ -29,9 +29,9 @@ private:
 	};
 
 	
-	queue<tuple<int, int, vector<string>>> queue; // BFS queue
+	//queue<tuple<int, int, vector<string>>> queue; // BFS queue
 	
-	const int tileSize = 40;
+	const int tileSize = 20;
 	
 	int calculateManhattanDistance(int x1, int y1, int x2, int y2)
 	{
@@ -75,9 +75,9 @@ public:
 	// Function to reset the board modification status
 	void resetBoardModified(){isBoardModified = false;}		
 
-	vector<vector<string>> AStarWithAllPaths(vector<vector<char>>& board);
-	int updateStartAndEndPoints(vector<vector<char>>& board);
-	vector<vector<string>> getShortestPaths(vector<vector<char>>& board, int r, int c);
-	void drawBoardAllPaths(sf::RenderWindow& window, vector<vector<char>>& board, const vector<string>& path, const vector<vector<string>>& allPaths, int r, int c);
-};
+	vector<vector<string>>findAllPaths(vector<vector<char>>& board);
+
+	void drawAllBoard(sf::RenderWindow& window, vector<vector<char>>& board, const vector<vector<string>>& allPaths, int r, int c);
+
+	};
 

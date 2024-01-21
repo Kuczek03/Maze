@@ -1,23 +1,17 @@
 Here is the solution:
 Down
 Right
-Down
-Right
-Down
-Right
-Down
-Down
 Right
 Right
-Up
-Up
+Right
 Right
 Right
 Right
 Right
 Down
 Down
-Right
+Down
+Down
 Down
 Down
 Down
