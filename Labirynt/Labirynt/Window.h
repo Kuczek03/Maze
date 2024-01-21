@@ -7,7 +7,7 @@ private:
 	Board board;
 	File file;
 	int r, c;
-	const int tileSize = 40;
+	const int tileSize = 20;
 
 	sf::RenderWindow* window= new sf::RenderWindow;
 	bool isStartModified = true;

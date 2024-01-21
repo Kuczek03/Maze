@@ -35,9 +35,11 @@ int File::saveSolution(const string& outname, vector<string> path)
     }
     else {
         outputFile << "Here is the solution:\n";
-        for (const string& direction : path) {
-            outputFile << direction << endl;
-        }
+        
+            for (const string& direction : path) {
+                outputFile << direction << endl;
+            }
+        
         outputFile << endl;
     }
 
@@ -95,4 +97,34 @@ void File::readAndUpdatePathFromFile(const string& filePath, vector<vector<char>
     }
 
     file.close();
+}
+
+int File::saveAllSolution(const string& outname, vector<vector<string>> paths)
+{
+    ofstream outputFile(outname);
+    if (!outputFile.is_open()) {
+        cerr << "Cannot create file " << outname << "." << endl;
+        return EXIT_FAILURE;
+    }
+
+    if (paths.empty()) {
+        outputFile << "There is no solution." << endl;
+    }
+    else {
+        outputFile << "Here is the solution:\n";
+
+        for (const auto& path : paths) {
+            for (const string& direction : path) {
+                outputFile << direction << endl;
+            }
+            outputFile << "----" << endl;  // Separate paths with "----"
+        }
+    }
+
+    outputFile << endl;
+    outputFile.close();
+
+    cout << "Solution saved in file " << outname << "." << endl;
+
+    return 1;
 }
