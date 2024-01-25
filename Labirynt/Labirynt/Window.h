@@ -13,8 +13,6 @@ private:
 	bool isStartModified = true;
 public:
 	void mazeFromFile(const string& filename, const string& outname);
-	//void randomGeneratedMaze(const string& filename, const string& outname);
-
-	void drawMaze(const string& outname, int choice, int r, int c);
+	void drawRandomMaze(const string& outname, int choice, int r, int c, double wallProbability);
 };
 
