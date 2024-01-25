@@ -42,22 +42,22 @@ int main()
         cout << "Insert number of rows and columns (r c): ";
         cin >> r >> c;
         
-        window.drawMaze(outname, choice, r, c);
+        //window.drawRandomMaze("outname", choice, r, c);
     }
     else if (choice == 3) {
         cout << "Insert number of rows and columns (r c): ";
         cin >> r >> c;
-        cout << "Insert probability of walls: ";
-        cin >> wallProbability;
+        do {
+            cout << "Insert probability of walls: ";
+            cin >> wallProbability;
 
-        // Validate wall probability
-        if (wallProbability < 0.0 || wallProbability > 1.0) {
-            cerr << "Error: Wall probability must be between 0 and 1." << endl;
-            return 1; // Exit with an error code
-        }
-
-        // Generate and display the maze
-        board.generateMazeWithProbability(r, c, wallProbability);
+            // Validate wall probability
+            if (wallProbability < 0.0 || wallProbability > 1.0) {
+                cerr << "Error: Wall probability must be between 0 and 1." << endl;
+            }
+        } while (wallProbability < 0.0 || wallProbability > 1.0);
+        // Generate and display the maze        
+        window.drawRandomMaze(outname, choice, r, c, wallProbability);
     }
     return 0;
 }
