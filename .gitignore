@@ -236,3 +236,5 @@ _Pvt_Extensions
 .fake/
 Labirynt/Labirynt/odp.txt
 Labirynt/Labirynt/odp.txt
+*.txt
+*.txt
