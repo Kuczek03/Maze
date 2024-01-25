@@ -1,11 +1,4 @@
 #include "Board.h"
-using namespace std;
-
-// Cheching if coordinates are valid on board
-bool Board::isValid(int x, int y, int r, int c) 
-{
-    return x >= 0 && x < r && y >= 0 && y < c;
-}
 
 /*vector<string> Board::BFS(vector<vector<char>>& board) 
 {
@@ -56,60 +49,10 @@ bool Board::isValid(int x, int y, int r, int c)
     return {};
 }*/
 
-
-// Funkcja rysuj¹ca planszê w oknie SFML
 void Board::drawBoard(sf::RenderWindow& window, vector<vector<char>>& board, vector<string>& path, int r, int c)
 {    
-    // Check if 'S' or 'M' has changed
-    int x = 0, y = 0;
-    bool isStartChanged = false;
-    bool isEndChanged = false;
+    setPathChar(board,path,r,c);
 
-    for (int i = 0; i < r; ++i) {
-        for (int j = 0; j < c; ++j) {
-            if (board[i][j] == 'S' && std::find(lastPath.begin(), lastPath.end(), "S") == lastPath.end()) {
-                isStartChanged = true;
-            }
-            else if (board[i][j] == 'M' && std::find(lastPath.begin(), lastPath.end(), "M") == lastPath.end()) {
-                isEndChanged = true;
-            }
-        }
-    }   
-    // If 'S' or 'M' has changed, update the path
-    if (isStartChanged || isEndChanged) {
-        for (int i = 0; i < r; i++)
-            for (int j = 0; j < c; j++)
-                if (board[i][j] == 'S') {
-                    x = j;
-                    y = i;
-                }
-        path = AStar(board);                
-    }  
-    // Draw the current path by changing 'B' to 'b'
-    for (const string& direction : path) {
-        if (direction == "Up") {
-            y--;
-        }
-        else if (direction == "Down") {
-            y++;
-        }
-        else if (direction == "Left") {
-            x--;
-        }
-        else if (direction == "Right") {
-            x++;
-        }
-        else {
-            cerr << "Error. Unknown direction on path" << endl;
-            exit(EXIT_FAILURE);
-        }
-
-        // Change 'B' to 'b' in the maze
-        if (board[y][x] == 'B') {
-            board[y][x] = 'b';
-        }
-    }
-    
     // Draw the maze
     for (int i = 0; i < r; ++i) {
         for (int j = 0; j < c; ++j) {
@@ -138,7 +81,6 @@ void Board::drawBoard(sf::RenderWindow& window, vector<vector<char>>& board, vec
     }    
 }
 
-
 void Board::updateBoardWithMouseClick(sf::Vector2i mousePos, vector<vector<char>>& maze) {
     int row = mousePos.y / tileSize;
     int col = mousePos.x / tileSize;
@@ -152,10 +94,32 @@ void Board::updateBoardWithMouseClick(sf::Vector2i mousePos, vector<vector<char>
     
 }
 
-vector<vector<char>> Board::setPathChar(vector<vector<char>>& board, vector<string>& path)
+vector<vector<char>> Board::setPathChar(vector<vector<char>>& board, vector<string>& path, int r, int c)
 {
+    // Check if 'S' or 'M' has changed
     int x = 0, y = 0;
-    for (string& direction : path) {
+    bool isStartChanged = false;
+    bool isEndChanged = false;
+
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            if (board[i][j] == 'S' && std::find(lastPath.begin(), lastPath.end(), "S") == lastPath.end()) {
+                isStartChanged = true;
+            }
+        }
+    }
+    // If 'S' has changed, update the path
+    if (isStartChanged || isEndChanged) {
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++)
+                if (board[i][j] == 'S') {
+                    x = j;
+                    y = i;
+                }
+        path = AStar(board);
+    }
+    // Draw the current path by changing 'B' to 'b'
+    for (const string& direction : path) {
         if (direction == "Up") {
             y--;
         }
@@ -199,14 +163,12 @@ vector<vector<char>> Board::generateMaze(int r, int c) {
 
     // Create a 2D array to represent the maze
     vector<vector<char>> maze(r, vector<char>(c));
-
     // Fill the maze with walls ("C")
     for (int i = 0; i < r; ++i) {
         for (int j = 0; j < c; ++j) {
             maze[i][j] = 'C';
         }
     }
-
     // Generate random floors ("B")
     for (int i = 1; i < r - 1; ++i) {
         for (int j = 1; j < c - 1; ++j) {
@@ -216,7 +178,6 @@ vector<vector<char>> Board::generateMaze(int r, int c) {
             }
         }
     }
-
     // Print the generated maze
     for (int i = 0; i < r; ++i) {
         for (int j = 0; j < c; ++j) {
@@ -241,7 +202,6 @@ vector<vector<char>> Board::generateMazeWithProbability(int r, int c, double wal
             maze[i][j] = (randomValue < wallProbability) ? 'C' : 'B';
         }
     }
-
     // Print the generated maze
     for (int i = 0; i < r; ++i) {
         for (int j = 0; j < c; ++j) {
@@ -252,7 +212,8 @@ vector<vector<char>> Board::generateMazeWithProbability(int r, int c, double wal
     return maze;
 }
 
-void Board::cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze) {
+void Board::cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze)
+{
     int row = mousePos.y / tileSize;
     int col = mousePos.x / tileSize;
 
@@ -269,7 +230,8 @@ void Board::cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>
     }
 }
 
-void Board::addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze) {
+void Board::addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze) 
+{
     int row = mousePos.y / tileSize;
     int col = mousePos.x / tileSize;
 
@@ -317,12 +279,12 @@ vector<string> Board::AStar(vector<vector<char>>& board)
     // Helper function to calculate Manhattan distance
     auto calculateManhattanDistance = [](int x1, int y1, int x2, int y2) {
         return std::abs(x1 - x2) + std::abs(y1 - y2);
-        };
+    };
 
     // Priority queue to store nodes with the lowest f value on top
     auto comparator = [](Node* a, Node* b) {
         return a->getF() > b->getF();
-        };
+    };
 
     priority_queue<Node*, vector<Node*>, decltype(comparator)> pq(comparator);
 
@@ -482,8 +444,7 @@ vector<vector<string>> Board::findAllPaths(vector<vector<char>>& board) {
 
     return shortestPaths;
 }
-
-void Board::drawAllBoard(sf::RenderWindow& window, vector<vector<char>>& board, const vector<vector<string>>& allPaths, int r, int c)
+/*void Board::drawAllBoard(sf::RenderWindow& window, vector<vector<char>>& board, const vector<vector<string>>& allPaths, int r, int c)
 {
     // Find or create 'S' and 'M' positions
     int startRow = -1, startCol = -1;
@@ -569,4 +530,5 @@ void Board::drawAllBoard(sf::RenderWindow& window, vector<vector<char>>& board, 
             window.draw(tile);
         }
     }
-}
+}*/
+
