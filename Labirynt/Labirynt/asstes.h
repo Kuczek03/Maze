@@ -1,3 +1,4 @@
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -8,4 +9,5 @@
 #include <locale.h>
 #include <random>
 #include <cmath>
+#include <sstream>
 using namespace std;

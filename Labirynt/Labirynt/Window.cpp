@@ -1,115 +1,176 @@
 #include "Window.h"
-
+#include "Button.h"
+#include "InputBox.h"
 void Window::mazeFromFile(const string& filename, const string& outname)
 {
-    // Loading the board
-    vector<vector<char>> maze = file.loadBoardFromFile(filename, r, c);
+	vector<vector<char>> maze = file.loadBoardFromFile(filename, r, c);	
+	
+	vector<string> path = board.AStar(maze);
 
-    // Returning board
-    cout << "Board:" << endl;
-    for (int i = 0; i < r; ++i) {
-        for (int j = 0; j < c; ++j) {
-            cout << maze[i][j] << " ";
-        }
-        cout << endl;
-    }
+	window->create(sf::VideoMode(c * tileSize, r * tileSize), "Maze from the file", sf::Style::Titlebar | sf::Style::Close);
 
-    // Solving labirinth
-    vector<string> path = board.AStar(maze);
-    vector<vector<string>> path2 = board.findAllPaths(maze);
-    window->create(sf::VideoMode(c * tileSize, r * tileSize), "Maze from the file", sf::Style::Titlebar | sf::Style::Close);
+	while (window->isOpen()) {
+		sf::Event ev;
+		while (window->pollEvent(ev)) {
+			if (ev.type == sf::Event::Closed) {
+				window->close();
+				board.setBoardModified();
+				menu();
+			}
+			else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
+				sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+				board.updateBoardWithMouseClick(mousePos, maze);
+				board.cellChange(r, c, mousePos, maze);
 
-    // Window loop
-    while (window->isOpen()) {
-        sf::Event ev;
+			}
+			else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::S) {
+				sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+				board.addStartPoint(r, c, mousePos, maze);
+			}
+			else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
+				sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+				board.addEndPoint(r, c, mousePos, maze);
 
-        while (window->pollEvent(ev)) {
-            if (ev.type == sf::Event::Closed) {
-                window->close();
-            }
-            else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                board.updateBoardWithMouseClick(mousePos, maze);
-                board.cellChange(r, c, mousePos, maze);
+			}
+			else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::R) {}
+		}
 
-            }
-            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::S) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                board.addStartPoint(r, c, mousePos, maze);
-            }
-            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                board.addEndPoint(r, c, mousePos, maze);
+		window->clear();
 
-            }
-            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::R) {}
-        }
+	   if (board.hasBoardModified()) {
+			path = board.AStar(maze);
+			board.updateAllBtoB(maze, r, c);
+			board.drawBoard(*window, maze, path, r, c);
+			board.resetBoardModified();
+			window->display();
+		}		
+	}
+		vector<string> newPath = board.AStar(maze);		
+		file.saveSolution(outname, newPath);		
+}
 
-        window->clear();
-
-       // Draw the board with all paths
-       if (board.hasBoardModified()) {
-            // Redraw the updated board
-            path = board.AStar(maze);
-            board.updateAllBtoB(maze, r, c);
-            board.drawBoard(*window, maze, path, r, c);
-            board.resetBoardModified();
-            window->display();
-        }
-        /*if (board.hasBoardModified()) {
-            // Redraw the updated board
-            path2 = board.findAllPaths(maze);
-            board.updateAllBtoB(maze, r, c);
-            board.drawAllBoard(*window, maze, path2, r, c);
-            board.resetBoardModified();
-            window->display();
-        }*/
-        
-    }
-        vector<string> newPath = board.AStar(maze);
-        //vector<vector<string>> newPath2 = board.findAllPaths(maze);
-        file.saveSolution(outname, newPath);
-        //file.saveAllSolution(outname, newPath2);
-    }
-
-void Window::drawRandomMaze(const string& outname, int choice, int r, int c, double wallProbability)
+void Window::drawRandomMaze(const string& outname, int r, int c, double wallProbability)
 {
-    vector<vector<char>> maze = board.generateMazeWithProbability(r, c, wallProbability);
-    vector<string> path = board.AStar(maze);
-    window->create(sf::VideoMode(c * tileSize, r * tileSize), "Random generated maze", sf::Style::Titlebar | sf::Style::Close);
-    
-    while (window->isOpen()) {
-        sf::Event ev;
-        while (window->pollEvent(ev)) {
-            if (ev.type == sf::Event::Closed) {
-                window->close();
-            }
-            else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) { 
-                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                board.updateBoardWithMouseClick(mousePos, maze);
-                board.cellChange(r, c, mousePos, maze);
-            }
-            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::S) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                board.addStartPoint(r, c, mousePos, maze);
-            }
-            else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-                board.addEndPoint(r, c, mousePos, maze);
-            }
-        }
+	vector<vector<char>> maze = board.generateMazeWithProbability(r, c, wallProbability);
+	vector<string> path = board.AStar(maze);
 
-        window->clear();
-        // Draw the board with all paths
-        if (board.hasBoardModified()) {
-            // Redraw the updated board
-            path = board.AStar(maze);
-            board.updateAllBtoB(maze, r, c);
-            board.drawBoard(*window, maze, path, r, c);
-            board.resetBoardModified();
-            window->display();
-        }
-    }
-    vector<string> newPath = board.AStar(maze);
-    file.saveSolution("RandomOdp.txt", newPath);
+	window->create(sf::VideoMode(c * tileSize, r * tileSize), "Random generated maze", sf::Style::Titlebar | sf::Style::Close);
+	
+	while (window->isOpen()) {
+		sf::Event ev;
+		while (window->pollEvent(ev)) {
+			if (ev.type == sf::Event::Closed) {				
+				window->close();
+				board.setBoardModified();
+				menu();				
+			}
+			else if (ev.type == sf::Event::MouseButtonPressed && ev.mouseButton.button == sf::Mouse::Left) { 
+				sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+				board.updateBoardWithMouseClick(mousePos, maze);
+				board.cellChange(r, c, mousePos, maze);
+			}
+			else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::S) {
+				sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+				board.addStartPoint(r, c, mousePos, maze);
+			}
+			else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
+				sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+				board.addEndPoint(r, c, mousePos, maze);
+			}
+			
+		}
+
+		window->clear();
+
+		if (board.hasBoardModified()) {			
+			path = board.AStar(maze);			
+			board.updateAllBtoB(maze, r, c);
+			board.drawBoard(*window, maze, path, r, c);
+			board.resetBoardModified();
+			window->display();
+		}
+	}
+	vector<string> newPath = board.AStar(maze);
+	file.saveSolution("RandomOdp.txt", newPath);
+}
+
+
+void Window::menu() {
+
+	window->create(sf::VideoMode(400,400), "Path finder", sf::Style::Titlebar | sf::Style::Close);
+	
+	sf::Font font;
+	sf::Color 
+		blue(117, 208, 236),
+		background(102, 153, 255);
+	font.loadFromFile("fonts/Lato-Italic.ttf");
+
+	Button
+		pathFromFile(125.f, 110.f, 150.f, 75.f, "Random Maze", font, blue, sf::Color::White),
+		randomMaze(125.f, 200.f, 150.f, 75.f, "Maze from file", font, blue, sf::Color::White),
+		exit(125.f, 290.f, 150.f, 75.f, "Exit", font, blue, sf::Color::White);
+	
+	sf::Text title;
+	title.setFont(font);
+	title.setString("Path Finder!");
+	title.setCharacterSize(60);
+	title.setOutlineThickness(2);
+	title.setOutlineColor(sf::Color::Black);
+	title.setFillColor(sf::Color::White);
+	title.setPosition(50.f, 15.f);
+
+	while (window->isOpen()) {
+		sf::Event ev;
+		
+		while (window->pollEvent(ev)) {
+			if (ev.type == sf::Event::Closed) {
+				window->close();
+			}
+
+			if (ev.type == sf::Event::MouseButtonReleased && ev.mouseButton.button == sf::Mouse::Left) {				 
+				
+				if (pathFromFile.isMouseOver(*window)) {					
+
+					InputBox inputBox("Enter Data", font);
+					auto result = inputBox.r3n();
+
+					int r = std::get<0>(result);
+					int c = std::get<1>(result);
+					double w = std::get<2>(result);
+
+					std::cout << "User Input 1: " << r << std::endl;
+					std::cout << "User Input 2: " << c << std::endl;
+					std::cout << "User Input 3: " << w << std::endl;
+
+					drawRandomMaze("RandomOpd.txt",r,c,w);
+				}
+				
+				if (randomMaze.isMouseOver(*window)) {										
+					string userInput;
+					
+					do{	
+						InputBox inputBox("Enter file name:", font);
+						userInput = inputBox.run();
+						ifstream file(userInput);
+					
+						if (file.good())
+							break;
+						else {						
+							file.clear();
+						}
+					} while (true);	
+					mazeFromFile(userInput, "odp.txt");
+				}
+				if (exit.isMouseOver(*window)) {
+					window->close();
+				}				
+			}
+		} 
+		window->clear(background);
+		window->draw(title);
+		pathFromFile.draw(*window);
+		randomMaze.draw(*window);
+		exit.draw(*window);
+		window->display();
+	}
 }
