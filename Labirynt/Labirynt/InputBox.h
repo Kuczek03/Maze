@@ -15,10 +15,9 @@ private:
     string userInput3;
 
     string userInput;
-    int inputStage = 0;  // 0: userInput1, 1: userInput2, 2: userInput3
+    int inputStage = 0;
     void handleEvents();
     void handleTextEntered(sf::Uint32 unicode);
-    void update();
     void render();
 public:
     InputBox(const string& title, sf::Font& font);

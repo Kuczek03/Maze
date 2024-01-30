@@ -11,9 +11,9 @@ private:
     sf::Color textColor;
     sf::Text buttonText;
 public:
-    Button(float x, float y, float width, float height, const std::string& text, const sf::Font& font, sf::Color bttnClr, sf::Color txtClr);        
+    Button(float x, float y, float width, float height, const std::string& text, 
+        const sf::Font& font, sf::Color bttnClr, sf::Color txtClr);        
 
     bool isMouseOver(const sf::RenderWindow& window) const;
     void draw(sf::RenderWindow& window) const;
-    //void handleButtonClick() const;
 };

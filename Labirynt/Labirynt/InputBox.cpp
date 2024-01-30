@@ -28,23 +28,20 @@ InputBox::InputBox(const string& title, sf::Font& font) {
     wText.setPosition(170, 120);
     wText.setFillColor(sf::Color::White);
 }
-std::tuple<int, int, double> InputBox::r3n() {
+tuple<int, int, double> InputBox::r3n() {
     while (window.isOpen()) {
         handle3vents();
-        update();
         r3nder();
     }
-
     try {
-        // Return a tuple containing the three variables
         inputStage = 0;
-        return std::make_tuple(std::stoi(userInput1), std::stoi(userInput2), std::stod(userInput3));
+        return make_tuple(std::stoi(userInput1), std::stoi(userInput2), std::stod(userInput3));
     }
     catch (const std::invalid_argument& e) {
         cerr << "Invalid input. Please enter valid numeric values." << std::endl;
-        // Handle the error as needed
+
         inputStage = 0;
-        return make_tuple(10, 10, 0.1); // Default values or handle the error in a way that makes sense for your application
+        return make_tuple(10, 10, 0.1);
     }
 }
 void InputBox::handleText3ntered(sf::Uint32 unicode) {
@@ -71,7 +68,7 @@ void InputBox::handleText3ntered(sf::Uint32 unicode) {
         wText.setString(userInput3);
     }
     else if (unicode == ' ') {
-        ++inputStage;  // Move to the next input stage when spacebar is pressed
+        ++inputStage;  
     }
     else if (unicode == ' ' && inputStage > 2) {
         inputStage = 0;
@@ -103,7 +100,6 @@ void InputBox::r3nder() {
 string InputBox::run() {
     while (window.isOpen()) {
         handleEvents();
-        update();
         render();
     }
 
@@ -123,18 +119,16 @@ void InputBox::handleEvents() {
 }
 
 void InputBox::handleTextEntered(sf::Uint32 unicode) {
-    if (unicode < 128 && unicode != 8) { // ASCII characters excluding Backspace
+    if (unicode < 128 && unicode != 8) { 
         userInput += static_cast<char>(unicode);
     }
-    else if (unicode == 8 && !userInput.empty()) { // Backspace
+    else if (unicode == 8 && !userInput.empty()) { 
         userInput.pop_back();
     }
 
     filenameText.setString(userInput);
 }
 
-void InputBox::update() {   
-}
 
 void InputBox::render() {
     window.clear();

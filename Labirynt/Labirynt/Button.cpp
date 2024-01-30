@@ -26,12 +26,6 @@ bool Button::isMouseOver(const sf::RenderWindow& window) const
 	return buttonShape.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));
 }
 
-/*void Button::handleButtonClick() const
-{
-	std::cout << "Button Clicked!" << std::endl;
-}*/
-
-
 void Button::draw(sf::RenderWindow& window) const
 {
 	window.draw(buttonShape);

@@ -3,27 +3,24 @@
 class Board
 {
 private:
-	// Structure representing coordinates on board
-	struct Point {
+/*struct Point {
 		int x, y;
 
 		Point(int x, int y) : x(x), y(y) {}
-	};
+	};*/
+	
 
 	struct Node{
 		int x, y;
-		int g;  // cost from start
-		int h;  // heuristic (Manhattan distance to goal)
-		Node* parent;  // pointer to the parent node
+		int g;
+		int h;
+		Node* parent;  
 
 		Node(int x, int y, int g, int h, Node* parent): x(x), y(y), g(g), h(h), parent(parent) {}
 
-		// A* uses f = g + h to prioritize nodes
 		int getF() const { return g + h; }
 	};
 
-	
-	//queue<tuple<int, int, vector<string>>> q, queue; // BFS queue	
 	const int tileSize = 20;	
 	int calculateManhattanDistance(int x1, int y1, int x2, int y2){ return abs(x1 - x2) + abs(y1 - y2); }				
 	bool isBoardModified = true;
@@ -45,19 +42,8 @@ public:
 
 	void cellChange(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
 	void addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
-	void addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
-	
+	void addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);	
 	
 	vector<string> AStar(vector<vector<char>>& board);
-
-	/*vector<string> BFS(vector<vector<char>>& board);
-	vector<vector<string>> findAllShortestPaths(vector<vector<char>>& board);
-	vector<vector<string>> findAllPaths(vector<vector<char>>& board);
-	
-	void drawAllBoard(sf::RenderWindow& window, vector<vector<char>>& board, vector<vector<string>>& path, int r, int c);
-	vector<vector<char>> setAllPathChar(vector<vector<char>>& board, vector<vector<string>>& allPaths, int r, int c);
-	
-*/
-
 	};
 
