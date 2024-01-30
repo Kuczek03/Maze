@@ -23,29 +23,23 @@ private:
 	};
 
 	
-	//queue<tuple<int, int, vector<string>>> queue; // BFS queue	
+	//queue<tuple<int, int, vector<string>>> q, queue; // BFS queue	
 	const int tileSize = 20;	
 	int calculateManhattanDistance(int x1, int y1, int x2, int y2){ return abs(x1 - x2) + abs(y1 - y2); }				
 	bool isBoardModified = true;
 	
 	vector<string> lastPath, pathh;	
-public:
-	vector<vector<char>> brd;
-	vector<string> BFS(vector<vector<char>>& board);
-
+public:		
 	bool isValid(int x, int y, int r, int c){return x >= 0 && x < r && y >= 0 && y < c;}
 	void drawBoard(sf::RenderWindow& window,  vector<vector<char>>& board, vector<string>& path, int r, int c);
 	void updateBoardWithMouseClick(sf::Vector2i mousePos, vector<vector<char>>& maze);
-
-	// Function to set the modification status to true
-	void setBoardModified() { isBoardModified = true; }
-
-	// Function to check if the board has been modified
-	vector<vector<char>> setPathChar(vector<vector<char>>& board, vector<string>& path, int r, int c);
-	bool hasBoardModified() const {	return isBoardModified;}
 	void updateAllBtoB(vector<vector<char>>& maze, int r, int c);
-	
-	
+	vector<vector<char>> setPathChar(vector<vector<char>>& board, vector<string>& path, int r, int c);
+
+	void setBoardModified() { isBoardModified = true; }
+	bool hasBoardModified() const {	return isBoardModified;}	
+	void resetBoardModified() { isBoardModified = false; }
+
 	vector<vector<char>> generateMaze(int r, int c);
 	vector<vector<char>> generateMazeWithProbability(int r, int c, double wallProbability);
 
@@ -53,14 +47,17 @@ public:
 	void addStartPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
 	void addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);
 	
+	
 	vector<string> AStar(vector<vector<char>>& board);
 
-	// Function to reset the board modification status
-	void resetBoardModified(){isBoardModified = false;}		
-
-	vector<vector<string>>findAllPaths(vector<vector<char>>& board);
-
-	void drawAllBoard(sf::RenderWindow& window, vector<vector<char>>& board, const vector<vector<string>>& allPaths, int r, int c);
+	/*vector<string> BFS(vector<vector<char>>& board);
+	vector<vector<string>> findAllShortestPaths(vector<vector<char>>& board);
+	vector<vector<string>> findAllPaths(vector<vector<char>>& board);
+	
+	void drawAllBoard(sf::RenderWindow& window, vector<vector<char>>& board, vector<vector<string>>& path, int r, int c);
+	vector<vector<char>> setAllPathChar(vector<vector<char>>& board, vector<vector<string>>& allPaths, int r, int c);
+	
+*/
 
 	};
 

@@ -5,8 +5,8 @@ using namespace std;
 int main() 
 {
     Window window;
-    Board board;
-    int choice;
+    /*Board board;
+    int choice=4;
     int r, c;
     double wallProbability;
     string filename, outname = "odp.txt";
@@ -14,7 +14,7 @@ int main()
     cout << "1. Choose maze from the file. \n";
     cout << "2. Choose random generated maze . \n";
     cout << "3. Choose random generated maze with probability for the walls. \n";
-    cin >> choice;
+    //cin >> choice;
 
     if (choice == 1){
         cout << "Read board from file: ";
@@ -23,22 +23,8 @@ int main()
         //cin >> outname;
 
         window.mazeFromFile(filename, outname);
-    }/*else if (choice == 2) {
 
-        cout << "Insert number of rows and columns (r c): ";
-        cin >> r >> c;
-
-        vector<vector<char>> maze = board.generateRandomMaze(r, c);
-
-        //Wypisz labirynt
-        cout << "Labirynt:" << endl;
-        for (int i = 0; i < r; ++i) {
-            for (int j = 0; j < c; ++j) {
-                cout << maze[i][j] << " ";
-            }
-            cout << endl;
-        }
-    }*/else if(choice == 2){  
+    }else if(choice == 2){  
         cout << "Insert number of rows and columns (r c): ";
         cin >> r >> c;
         
@@ -57,7 +43,11 @@ int main()
             }
         } while (wallProbability < 0.0 || wallProbability > 1.0);
         // Generate and display the maze        
-        window.drawRandomMaze(outname, choice, r, c, wallProbability);
+        window.drawRandomMaze(outname, r, c, wallProbability);
     }
+    else if (choice == 4) {}*/
+    
+       window.menu();
+    
     return 0;
 }

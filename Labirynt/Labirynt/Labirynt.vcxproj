@@ -131,14 +131,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="File.cpp" />
+    <ClCompile Include="InputBox.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="asstes.h" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="File.h" />
+    <ClInclude Include="InputBox.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

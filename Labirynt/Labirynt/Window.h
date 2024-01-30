@@ -11,8 +11,11 @@ private:
 
 	sf::RenderWindow* window= new sf::RenderWindow;
 	bool isStartModified = true;
+
+	
 public:
 	void mazeFromFile(const string& filename, const string& outname);
-	void drawRandomMaze(const string& outname, int choice, int r, int c, double wallProbability);
+	void drawRandomMaze(const string& outname, int r, int c, double wallProbability);	
+	void menu();	
 };
 
