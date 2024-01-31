@@ -1,6 +1,6 @@
 #include "InputBox.h"
 InputBox::InputBox(const string& title, sf::Font& font) {
- 
+    sf::Color background(102, 153, 255);
     window.create(sf::VideoMode(400, 200), title);
     
     titleText.setString(title);
@@ -90,7 +90,8 @@ void InputBox::handle3vents() {
     }
 }
 void InputBox::r3nder() {
-    window.clear();
+    sf::Color background(102, 153, 255);
+    window.clear(background);
     window.draw(titleText);
     window.draw(rText);
     window.draw(cText);
@@ -131,7 +132,8 @@ void InputBox::handleTextEntered(sf::Uint32 unicode) {
 
 
 void InputBox::render() {
-    window.clear();
+    sf::Color background(102, 153, 255);
+    window.clear(background);
     window.draw(titleText);
     window.draw(filenameText);
     window.display();

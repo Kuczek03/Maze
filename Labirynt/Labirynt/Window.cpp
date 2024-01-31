@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "Button.h"
 #include "InputBox.h"
+
 void Window::mazeFromFile(const string& filename, const string& outname)
 {
 	vector<vector<char>> maze = file.loadBoardFromFile(filename, r, c);	
@@ -43,6 +44,8 @@ void Window::mazeFromFile(const string& filename, const string& outname)
 			board.drawBoard(*window, maze, path, r, c);
 			board.resetBoardModified();
 			window->display();
+			if (path.empty() && window->isOpen())
+				noPathBox();
 		}		
 	}
 		vector<string> newPath = board.AStar(maze);		
@@ -85,9 +88,14 @@ void Window::drawRandomMaze(const string& outname, int r, int c, double wallProb
 		if (board.hasBoardModified()) {			
 			path = board.AStar(maze);			
 			board.updateAllBtoB(maze, r, c);
+			
 			board.drawBoard(*window, maze, path, r, c);
+			
 			board.resetBoardModified();
 			window->display();
+
+			if (path.empty()&&window->isOpen())
+				noPathBox();
 		}
 	}
 	vector<string> newPath = board.AStar(maze);
@@ -131,17 +139,13 @@ void Window::menu() {
 				
 				if (pathFromFile.isMouseOver(*window)) {					
 
-					InputBox inputBox("Enter Data", font);
+					InputBox inputBox("Enter R C and WallProb", font);
 					auto result = inputBox.r3n();
 
 					int r = std::get<0>(result);
 					int c = std::get<1>(result);
 					double w = std::get<2>(result);
-
-					std::cout << "User Input 1: " << r << std::endl;
-					std::cout << "User Input 2: " << c << std::endl;
-					std::cout << "User Input 3: " << w << std::endl;
-
+					
 					drawRandomMaze("RandomOpd.txt",r,c,w);
 				}
 				
@@ -173,4 +177,37 @@ void Window::menu() {
 		exit.draw(*window);
 		window->display();
 	}
+}
+
+int Window::noPathBox() {
+	sf::RenderWindow window(sf::VideoMode(200, 100), "Error");
+	sf::Color background(102, 153, 255);
+	sf::Font font;
+	if (!font.loadFromFile("fonts/Lato-Italic.ttf")) {
+		return EXIT_FAILURE;
+	}
+	sf::Text text;
+	text.setFont(font);
+	text.setString("Path not found");
+	text.setCharacterSize(30);
+	text.setFillColor(sf::Color::White);
+	sf::FloatRect textBounds = text.getLocalBounds();
+	text.setPosition((window.getSize().x - textBounds.width) / 2.f, (window.getSize().y - textBounds.height) / 2.f - 10);
+
+	while (window.isOpen()) {
+		sf::Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) {
+				window.close();
+			}
+		}
+
+		window.clear(background); 
+
+		window.draw(text);
+
+		window.display();
+	}
+
+	return EXIT_SUCCESS;
 }

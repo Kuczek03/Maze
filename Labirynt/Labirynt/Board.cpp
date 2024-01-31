@@ -3,6 +3,13 @@
 void Board::drawBoard(sf::RenderWindow& window, vector<vector<char>>& board, vector<string>& path, int r, int c)
 {    
 	setPathChar(board,path,r,c);
+	sf::Color
+		field(149,183,222),
+		wall(25,95,176),
+		start(70,189,102),
+		end(184,35,35),
+		pathC(237,226,109);
+
 
 	for (int i = 0; i < r; ++i) {
 		for (int j = 0; j < c; ++j) {
@@ -12,19 +19,19 @@ void Board::drawBoard(sf::RenderWindow& window, vector<vector<char>>& board, vec
 			tile.setPosition(j * tileSize, i * tileSize);
 
 			if (board[i][j] == 'B') {
-				tile.setFillColor(sf::Color::White);
+				tile.setFillColor(field);
 			}
 			else if (board[i][j] == 'C') {
-				tile.setFillColor(sf::Color::Black);
+				tile.setFillColor(wall);
 			}
 			else if (board[i][j] == 'S') {
-				tile.setFillColor(sf::Color::Green);
+				tile.setFillColor(start);
 			}
 			else if (board[i][j] == 'M') {
-				tile.setFillColor(sf::Color::Red);
+				tile.setFillColor(end);
 			}
 			else if (board[i][j] == 'b') {
-				tile.setFillColor(sf::Color::Blue);
+				tile.setFillColor(pathC);
 			}                            
 			window.draw(tile);
 		}
@@ -66,7 +73,7 @@ vector<vector<char>> Board::setPathChar(vector<vector<char>>& board, vector<stri
 				}
 		path = AStar(board);
 	}
-
+	
 	for (const string& direction : path) {
 		if (direction == "Up") {
 			y--;
@@ -81,14 +88,18 @@ vector<vector<char>> Board::setPathChar(vector<vector<char>>& board, vector<stri
 			x++;
 		}
 		else {
-			cerr << "Error. Unknown direction on path" << endl;
-			exit(EXIT_FAILURE);
+			//cerr << "Error. Unknown direction on path" << endl;
+			//exit(EXIT_FAILURE);
+			
 		}
 		if (board[y][x] == 'B') {
 			board[y][x] = 'b';
 		}
+		
 	}
+	
 	return board;
+	
 }
 
 
@@ -143,12 +154,13 @@ vector<vector<char>> Board::generateMazeWithProbability(int r, int c, double wal
 			maze[i][j] = (randomValue < wallProbability) ? 'C' : 'B';
 		}
 	}
-	for (int i = 0; i < r; ++i) {
+	/*for (int i = 0; i < r; ++i) {
 		for (int j = 0; j < c; ++j) {
 			cout << maze[i][j];
 		}
 		cout << endl;
-	}
+	}*/
+	
 	return maze;
 }
 

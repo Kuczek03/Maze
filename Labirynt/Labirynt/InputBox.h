@@ -19,6 +19,8 @@ private:
     void handleEvents();
     void handleTextEntered(sf::Uint32 unicode);
     void render();
+    
+
 public:
     InputBox(const string& title, sf::Font& font);
     

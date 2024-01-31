@@ -14,6 +14,8 @@ private:
 public:
 	void mazeFromFile(const string& filename, const string& outname);
 	void drawRandomMaze(const string& outname, int r, int c, double wallProbability);	
-	void menu();	
+	void menu();
+	int noPathBox();
+
 };
 
