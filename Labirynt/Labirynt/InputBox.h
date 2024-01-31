@@ -22,6 +22,7 @@ private:
     
 
 public:
+    sf::Event event;
     InputBox(const string& title, sf::Font& font);
     
     tuple<int, int, double> r3n();

@@ -162,14 +162,19 @@ void Window::menu() {
 						userInput = inputBox.run();
 						ifstream file(userInput);
 					
-						if (file.good())
+						if (inputBox.event.type == sf::Event::Closed)
 							break;
+						if (file.good()){
+							mazeFromFile(userInput, "odp.txt");
+							break;
+						}							
 						else {						
 							file.clear();
 						}
+						
 					} while (true);
 					
-					mazeFromFile(userInput, "odp.txt");
+					
 				}
 				if (exit.isMouseOver(*window)) {
 					window->close();
