@@ -1,4 +1,5 @@
 #include "InputBox.h"
+
 InputBox::InputBox(const string& title, sf::Font& font) {
     sf::Color background(102, 153, 255);
     window.create(sf::VideoMode(400, 200), title);

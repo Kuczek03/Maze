@@ -1,10 +1,15 @@
 #include "asstes.h"
 #include "Window.h"
+#include <crtdbg.h>
 using namespace std;
 int main() 
 {
 	Window window;
-	window.menu();
+	while (window.wypierdol)
+	{	
+		window.menu();
+	}
+	
 	
 	return 0;
 }

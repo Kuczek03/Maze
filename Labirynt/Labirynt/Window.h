@@ -16,6 +16,7 @@ public:
 	void drawRandomMaze(const string& outname, int r, int c, double wallProbability);	
 	void menu();
 	int noPathBox();
+	bool wypierdol=true;
 
 };
 

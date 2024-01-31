@@ -36,9 +36,10 @@ void Window::mazeFromFile(const string& filename, const string& outname)
 			else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::R) {}
 		}
 
-		window->clear();
+		
 
 	   if (board.hasBoardModified()) {
+		   window->clear();
 			path = board.AStar(maze);
 			board.updateAllBtoB(maze, r, c);
 			board.drawBoard(*window, maze, path, r, c);
@@ -83,9 +84,10 @@ void Window::drawRandomMaze(const string& outname, int r, int c, double wallProb
 			
 		}
 
-		window->clear();
+		
 
-		if (board.hasBoardModified()) {			
+		if (board.hasBoardModified()) {	
+			window->clear();
 			path = board.AStar(maze);			
 			board.updateAllBtoB(maze, r, c);
 			
@@ -111,7 +113,9 @@ void Window::menu() {
 	sf::Color 
 		blue(117, 208, 236),
 		background(102, 153, 255);
-	font.loadFromFile("fonts/Lato-Italic.ttf");
+	if (!font.loadFromFile("fonts/Lato-Italic.ttf")) {
+		return;
+	}
 
 	Button
 		pathFromFile(125.f, 110.f, 150.f, 75.f, "Random Maze", font, blue, sf::Color::White),
@@ -126,13 +130,14 @@ void Window::menu() {
 	title.setOutlineColor(sf::Color::Black);
 	title.setFillColor(sf::Color::White);
 	title.setPosition(50.f, 15.f);
-
+	
 	while (window->isOpen()) {
 		sf::Event ev;
 		
 		while (window->pollEvent(ev)) {
 			if (ev.type == sf::Event::Closed) {
 				window->close();
+				wypierdol = false;
 			}
 
 			if (ev.type == sf::Event::MouseButtonReleased && ev.mouseButton.button == sf::Mouse::Left) {				 
@@ -162,11 +167,13 @@ void Window::menu() {
 						else {						
 							file.clear();
 						}
-					} while (true);	
+					} while (true);
+					
 					mazeFromFile(userInput, "odp.txt");
 				}
 				if (exit.isMouseOver(*window)) {
 					window->close();
+					wypierdol = false;
 				}				
 			}
 		} 
