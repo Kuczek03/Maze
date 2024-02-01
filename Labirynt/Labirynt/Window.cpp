@@ -209,7 +209,10 @@ int Window::noPathBox() {
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
+			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape
+				|| event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space ||
+				event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter ||
+				(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)) {
 				window.close();
 			}
 		}
