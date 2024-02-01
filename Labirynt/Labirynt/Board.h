@@ -38,5 +38,7 @@ public:
 	void addEndPoint(int r, int c, sf::Vector2i mousePos, vector<vector<char>>& maze);	
 	
 	vector<string> AStar(vector<vector<char>>& board);
+	vector<vector<char>> pathWallToWall(vector<vector<char>>& board, vector<string>& path, int r, int c);
+	vector<string> BFSWallToWall(vector<vector<char>>& board);
 	};
 

@@ -36,10 +36,10 @@ tuple<int, int, double> InputBox::r3n() {
     }
     try {
         inputStage = 0;
-        return make_tuple(std::stoi(userInput1), std::stoi(userInput2), std::stod(userInput3));
+        return make_tuple(stoi(userInput1), stoi(userInput2), stod(userInput3));
     }
-    catch (const std::invalid_argument& e) {
-        cerr << "Invalid input. Please enter valid numeric values." << std::endl;
+    catch (const invalid_argument& e) {
+        cerr << "Invalid input. Please enter valid numeric values." << endl;
 
         inputStage = 0;
         return make_tuple(10, 10, 0.1);

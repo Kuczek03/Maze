@@ -5,9 +5,9 @@
 void Window::mazeFromFile(const string& filename, const string& outname)
 {
 	vector<vector<char>> maze = file.loadBoardFromFile(filename, r, c);	
-	
+		
 	vector<string> path = board.AStar(maze);
-
+	
 	window->create(sf::VideoMode(c * tileSize, r * tileSize), "Maze from the file", sf::Style::Titlebar | sf::Style::Close);
 
 	while (window->isOpen()) {
@@ -31,18 +31,14 @@ void Window::mazeFromFile(const string& filename, const string& outname)
 			else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::M) {
 				sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 				board.addEndPoint(r, c, mousePos, maze);
-
 			}
-			else if (ev.type == sf::Event::KeyPressed && ev.key.code == sf::Keyboard::R) {}
-		}
-
-		
+	}
 
 	   if (board.hasBoardModified()) {
-		   window->clear();
+			window->clear();			
 			path = board.AStar(maze);
-			board.updateAllBtoB(maze, r, c);
 			board.drawBoard(*window, maze, path, r, c);
+			board.updateAllBtoB(maze, r, c);			
 			board.resetBoardModified();
 			window->display();
 			if (path.empty() && window->isOpen())
@@ -89,10 +85,8 @@ void Window::drawRandomMaze(const string& outname, int r, int c, double wallProb
 		if (board.hasBoardModified()) {	
 			window->clear();
 			path = board.AStar(maze);			
-			board.updateAllBtoB(maze, r, c);
-			
-			board.drawBoard(*window, maze, path, r, c);
-			
+			board.updateAllBtoB(maze, r, c);		
+			board.drawBoard(*window, maze, path, r, c);			
 			board.resetBoardModified();
 			window->display();
 
@@ -106,7 +100,7 @@ void Window::drawRandomMaze(const string& outname, int r, int c, double wallProb
 
 
 void Window::menu() {
-
+	
 	window->create(sf::VideoMode(400,400), "Path finder", sf::Style::Titlebar | sf::Style::Close);
 	
 	sf::Font font;
@@ -147,9 +141,9 @@ void Window::menu() {
 					InputBox inputBox("Enter R C and WallProb", font);
 					auto result = inputBox.r3n();
 
-					int r = std::get<0>(result);
-					int c = std::get<1>(result);
-					double w = std::get<2>(result);
+					int r = get<0>(result);
+					int c = get<1>(result);
+					double w = get<2>(result);
 					
 					drawRandomMaze("RandomOpd.txt",r,c,w);
 				}
